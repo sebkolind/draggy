@@ -1,0 +1,23 @@
+{
+  "name": "@sebkolind/draggy",
+  "version": "0.0.1",
+  "description": "A lightweight drag-and-drop library built with TypeScript.",
+  "source": "lib/main.ts",
+  "module": "dist/draggy.js",
+  "types": "dist/draggy.d.ts",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "dev": "parcel watch lib/main.ts --no-cache",
+    "example": "parcel watch index.html"
+  },
+  "author": "sebkolind <sks1993@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@parcel/packager-ts": "^2.12.0",
+    "@parcel/transformer-typescript-types": "^2.12.0",
+    "parcel": "^2.12.0",
+    "typescript": "^5.5.3"
+  }
+}

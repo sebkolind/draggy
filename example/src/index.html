@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Draggy</title>
+    <style>
+      .draggable {
+      }
+
+      .draggable.draggy-dragging {
+        opacity: 0.5;
+        background-color: pink;
+      }
+    </style>
+  </head>
+  <body>
+    <div>
+      <ul>
+        <li class="draggable">I am draggable 1</li>
+        <li class="draggable">I am draggable 2</li>
+        <li class="draggable">I am draggable 3</li>
+        <li class="draggable">I am draggable 4</li>
+      </ul>
+      <div class="dropzone">I am the dropzone #1</div>
+      <div class="dropzone">I am the dropzone #2</div>
+      <div class="dropzone">I am the dropzone #3</div>
+    </div>
+    <script type="module" src="main.ts"></script>
+  </body>
+</html>
