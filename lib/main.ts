@@ -32,8 +32,10 @@ function draggy(options: Options) {
   const draggables = document.querySelectorAll(draggable);
   for (let idx = 0; idx < draggables.length; idx++) {
     const el = draggables[idx];
-    el.setAttribute("draggable", "true");
-    el.classList.add(classNames.draggable);
+    if (el) {
+      el.setAttribute("draggable", "true");
+      el.classList.add(classNames.draggable);
+    }
   }
 
   addEventListener("dragstart", (ev) => {
@@ -63,9 +65,9 @@ function draggy(options: Options) {
   const dropzones = document.querySelectorAll(dropzone);
   for (let idx = 0; idx < dropzones.length; idx++) {
     const el = dropzones[idx];
+    if (!el) return;
 
     el.classList.add(classNames.dropzone);
-
     el.addEventListener("dragover", (e) => {
       const ev = e as DragEvent;
 
@@ -74,7 +76,7 @@ function draggy(options: Options) {
       // i might want to find a better way to do this,
       // it's quite much on a 2ms loop [:
       const others = el.querySelectorAll(`.${classNames.draggable}`);
-      const othersPos = [...others].map((o) => {
+      const othersPos = Array.from(others).map((o) => {
         const rect = o.getBoundingClientRect();
         return {
           x: rect.x,
@@ -91,6 +93,7 @@ function draggy(options: Options) {
       const y = ev.clientY;
       for (let i = 0; i < othersPos.length; i++) {
         const op = othersPos[i];
+        if (!op) return;
         if (
           x < op.x + op.width &&
           x > op.x &&
