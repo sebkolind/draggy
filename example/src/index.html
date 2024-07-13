@@ -4,27 +4,103 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Draggy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      body {
+        font-family: "Inter", sans-serif;
+        color: #fff;
+        margin: 0;
+        padding: 0;
+        background-color: #1b1b1b;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
       .draggable {
       }
 
-      .draggable.draggy-dragging {
+      .draggy-dragging {
         opacity: 0.5;
         background-color: pink;
+      }
+
+      .draggy-dropzone {
+        padding: 12px;
+        border: 2px dashed blueviolet;
+        border-radius: 8px;
+      }
+
+      .draggy-hovered {
+        background-color: lightblue;
+      }
+      .draggy-hovered * {
+        pointer-events: none;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .dropzones {
+        margin: 0 auto;
+        display: flex;
+        width: 800px;
+        gap: 8px;
+      }
+      .dropzone {
+        width: 33.333%;
+      }
+
+      .draggables {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        width: 404px;
+        flex-wrap: wrap;
+        margin: 0 auto;
+        margin-top: 48px;
+        gap: 4px;
+        margin-bottom: 24px;
+      }
+      .draggable {
+        width: 100%;
+        border-radius: 8px;
+        border: 2px solid #000;
+        padding: 8px;
       }
     </style>
   </head>
   <body>
-    <div>
-      <ul>
-        <li class="draggable">I am draggable 1</li>
-        <li class="draggable">I am draggable 2</li>
-        <li class="draggable">I am draggable 3</li>
-        <li class="draggable">I am draggable 4</li>
-      </ul>
-      <div class="dropzone">I am the dropzone #1</div>
-      <div class="dropzone">I am the dropzone #2</div>
-      <div class="dropzone">I am the dropzone #3</div>
+    <div class="container">
+      <div class="header">
+        <h1>Draggy</h1>
+        <p>Lightweight drag&drop library built with TypeScript.</p>
+      </div>
+      <div class="draggables">
+        <div class="draggable">I am draggable 1</div>
+        <div class="draggable">I am draggable 2</div>
+        <div class="draggable">I am draggable 3</div>
+        <div class="draggable">I am draggable 4</div>
+      </div>
+      <div class="dropzones">
+        <div class="dropzone">I am the dropzone #1</div>
+        <div class="dropzone">I am the dropzone #2</div>
+        <div class="dropzone">I am the dropzone #3</div>
+      </div>
     </div>
     <script type="module" src="main.ts"></script>
   </body>
