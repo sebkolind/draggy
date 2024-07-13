@@ -24,6 +24,7 @@
       }
 
       .draggable {
+        margin-bottom: 10px;
       }
 
       .draggy-dragging {
@@ -41,7 +42,7 @@
         background-color: lightblue;
       }
       .draggy-hovered * {
-        pointer-events: none;
+        /* pointer-events: none; */
       }
 
       .container {
@@ -77,7 +78,7 @@
         margin-bottom: 24px;
       }
       .draggable {
-        width: 100%;
+        width: 233px;
         border-radius: 8px;
         border: 2px solid #000;
         padding: 8px;
@@ -97,7 +98,11 @@
         <div class="draggable">I am draggable 4</div>
       </div>
       <div class="dropzones">
-        <div class="dropzone">I am the dropzone #1</div>
+        <div class="dropzone">
+          <div class="draggable">I am draggable 5</div>
+          <div class="draggable">I am draggable 6</div>
+          <div class="draggable">I am draggable 7</div>
+        </div>
         <div class="dropzone">I am the dropzone #2</div>
         <div class="dropzone">I am the dropzone #3</div>
       </div>
