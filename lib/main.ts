@@ -1,7 +1,10 @@
 import { Options } from "./types";
 
+const PLACEHOLDER_CN = "draggy-placeholder";
+
 function draggy(options: Options) {
   let dragged: Element | null = null;
+  let clone: HTMLElement | null = null;
 
   const {
     draggable,
@@ -38,7 +41,6 @@ function draggy(options: Options) {
 
     const t = ev.target as Element;
     dragged = t;
-
     t.classList.add(classNames.dragging);
   });
 
@@ -47,6 +49,7 @@ function draggy(options: Options) {
 
     const t = ev.target as Element;
     t.classList.remove(classNames.dragging);
+    clone?.remove();
   });
 
   addEventListener("dragleave", (ev) => {
@@ -54,24 +57,60 @@ function draggy(options: Options) {
 
     const t = ev.target as Element;
     t.classList.remove(classNames.hovered);
-
     dragged?.classList.remove(classNames.hovering);
   });
 
   const dropzones = document.querySelectorAll(dropzone);
   for (let idx = 0; idx < dropzones.length; idx++) {
-    const el = document.querySelectorAll(dropzone)[idx];
+    const el = dropzones[idx];
 
     el.classList.add(classNames.dropzone);
 
-    el.addEventListener("dragover", (ev) => {
+    el.addEventListener("dragover", (e) => {
+      const ev = e as DragEvent;
+
       ev.preventDefault();
+
+      // i might want to find a better way to do this,
+      // it's quite much on a 2ms loop [:
+      const others = el.querySelectorAll(`.${classNames.draggable}`);
+      const othersPos = [...others].map((o) => {
+        const rect = o.getBoundingClientRect();
+        return {
+          x: rect.x,
+          y: rect.y,
+          height: rect.height,
+          width: rect.width,
+          el: o,
+        };
+      });
 
       onOver?.();
 
-      const t = ev.target as Element;
-      t.classList.add(classNames.hovered);
+      const x = ev.clientX;
+      const y = ev.clientY;
+      for (let i = 0; i < othersPos.length; i++) {
+        const op = othersPos[i];
+        if (
+          x < op.x + op.width &&
+          x > op.x &&
+          y < op.y + op.height &&
+          y > op.y
+        ) {
+          if (!clone) {
+            clone = dragged?.cloneNode() as HTMLElement;
+            clone.style.height = `${dragged?.scrollHeight}px`;
+            clone.className = PLACEHOLDER_CN;
+            clone.attributes.removeNamedItem("draggable");
+          }
+          el.insertBefore(
+            clone,
+            y < op.y + op.height / 2 ? op.el : op.el.nextSibling,
+          );
+        }
+      }
 
+      el.classList.add(classNames.hovered);
       dragged?.classList.add(classNames.hovering);
     });
 
@@ -79,15 +118,16 @@ function draggy(options: Options) {
       ev.preventDefault();
 
       const t = ev.target as Element;
-      t.classList.remove(classNames.hovered);
+      el.classList.remove(classNames.hovered);
 
-      if (isDropzone({ el: t }) && dragged) {
-        const handler = onDrop?.();
+      const isPlaceholder = t.classList.contains(PLACEHOLDER_CN);
+      if ((isPlaceholder || isDropzone({ el: t })) && dragged) {
+        onDrop?.();
 
         dragged.classList.remove(classNames.dragging, classNames.hovering);
 
-        if (handler) {
-          handler({ dragged, target: t });
+        if (isPlaceholder) {
+          t.replaceWith(dragged);
         } else {
           t.append(dragged);
         }

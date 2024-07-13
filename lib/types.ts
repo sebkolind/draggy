@@ -13,9 +13,7 @@ type Options = {
   onLeave?: () => void;
   onEnd?: () => void;
   onOver?: () => void;
-  onDrop?: () =>
-    | void
-    | ((context: { dragged: Element; target: Element }) => void);
+  onDrop?: () => void;
 };
 
 export { Options };
