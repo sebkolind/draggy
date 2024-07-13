@@ -1,6 +1,14 @@
 import { Options } from "./types";
+import { isElement } from "./utils";
 
 const PLACEHOLDER_CN = "draggy-placeholder";
+const CLASSNAMES = {
+  draggable: "draggy-draggable",
+  dropzone: "draggy-dropzone",
+  dragging: "draggy-dragging",
+  hovering: "draggy-hovering",
+  hovered: "draggy-hovered",
+};
 
 function draggy(options: Options) {
   let dragged: Element | null = null;
@@ -17,24 +25,12 @@ function draggy(options: Options) {
     onDrop,
   } = options;
 
-  const defaultClassNames = {
-    draggable: "draggy-draggable",
-    dropzone: "draggy-dropzone",
-    dragging: "draggy-dragging",
-    hovering: "draggy-hovering",
-    hovered: "draggy-hovered",
-  };
-  const classNames = {
-    ...defaultClassNames,
-    ...options.classNames,
-  };
-
   const draggables = document.querySelectorAll(draggable);
   for (let idx = 0; idx < draggables.length; idx++) {
     const el = draggables[idx];
     if (el) {
       el.setAttribute("draggable", "true");
-      el.classList.add(classNames.draggable);
+      el.classList.add(CLASSNAMES.draggable);
     }
   }
 
@@ -43,14 +39,14 @@ function draggy(options: Options) {
 
     const t = e.target as Element;
     dragged = t;
-    t.classList.add(classNames.dragging);
+    t.classList.add(CLASSNAMES.dragging);
   });
 
   addEventListener("dragend", (e) => {
     onEnd?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(classNames.dragging);
+    e.target.classList.remove(CLASSNAMES.dragging);
     clone?.remove();
   });
 
@@ -58,8 +54,8 @@ function draggy(options: Options) {
     onLeave?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(classNames.hovered);
-    dragged?.classList.remove(classNames.hovering);
+    e.target.classList.remove(CLASSNAMES.hovered);
+    dragged?.classList.remove(CLASSNAMES.hovering);
   });
 
   const dropzones = document.querySelectorAll(dropzone);
@@ -67,7 +63,7 @@ function draggy(options: Options) {
     const el = dropzones[idx];
     if (!el) return;
 
-    el.classList.add(classNames.dropzone);
+    el.classList.add(CLASSNAMES.dropzone);
     el.addEventListener("dragover", (e) => {
       // the "dragover" event is not a DragEvent, for some reason...
       if (!(e instanceof DragEvent)) return;
@@ -76,7 +72,7 @@ function draggy(options: Options) {
 
       // i might want to find a better way to do this,
       // it's quite much on a 2ms loop [:
-      const others = el.querySelectorAll(`.${classNames.draggable}`);
+      const others = el.querySelectorAll(`.${CLASSNAMES.draggable}`);
       const othersPos = Array.from(others).map((o) => {
         const rect = o.getBoundingClientRect();
         return {
@@ -114,15 +110,15 @@ function draggy(options: Options) {
         }
       }
 
-      el.classList.add(classNames.hovered);
-      dragged?.classList.add(classNames.hovering);
+      el.classList.add(CLASSNAMES.hovered);
+      dragged?.classList.add(CLASSNAMES.hovering);
     });
 
     el.addEventListener("drop", (e) => {
       e.preventDefault();
 
       if (!isElement(e.target)) return;
-      el.classList.remove(classNames.hovered);
+      el.classList.remove(CLASSNAMES.hovered);
 
       if (
         (e.target.classList.contains(PLACEHOLDER_CN) ||
@@ -130,7 +126,7 @@ function draggy(options: Options) {
         dragged
       ) {
         onDrop?.();
-        dragged.classList.remove(classNames.dragging, classNames.hovering);
+        dragged.classList.remove(CLASSNAMES.dragging, CLASSNAMES.hovering);
         if (e.target.classList.contains(PLACEHOLDER_CN)) {
           e.target.replaceWith(dragged);
         } else {
@@ -140,9 +136,5 @@ function draggy(options: Options) {
     });
   }
 }
-
-const isElement = (target: EventTarget | null): target is Element => {
-  return target instanceof Element;
-};
 
 export { draggy };
