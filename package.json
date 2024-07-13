@@ -9,7 +9,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "parcel build",
+    "build": "rm -rf .parcel-cache dist && parcel build",
     "dev": "parcel watch lib/main.ts --no-cache",
     "example": "parcel watch index.html"
   },
