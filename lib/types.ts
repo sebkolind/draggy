@@ -1,7 +1,14 @@
-type Config = {
+type Options = {
   draggable: string;
   dropzone: string;
   isDropzone: (context: { el: Element }) => boolean;
+  classNames?: {
+    draggable?: string;
+    dropzone?: string;
+    dragging?: string;
+    hovering?: string;
+    hovered?: string;
+  };
   onDragStart?: () => void;
   onDragLeave?: () => void;
   onDragEnd?: () => void;
@@ -11,4 +18,4 @@ type Config = {
     | ((context: { dragged: Element; target: Element }) => void);
 };
 
-export { Config };
+export { Options };
