@@ -1,22 +1,37 @@
-import { Config } from "./types";
+import { Options } from "./types";
 
-function draggy({
-  draggable,
-  dropzone,
-  isDropzone,
-  onDragStart,
-  onDragLeave,
-  onDragEnd,
-  onDragOver,
-  onDrop,
-}: Config) {
+function draggy(options: Options) {
   let dragged: Element | null = null;
 
-  document.querySelectorAll(draggable).forEach((el) => {
-    if (!el.hasAttribute("draggable")) {
-      el.setAttribute("draggable", "true");
-    }
-  });
+  const {
+    draggable,
+    dropzone,
+    isDropzone,
+    onDragStart,
+    onDragLeave,
+    onDragEnd,
+    onDragOver,
+    onDrop,
+  } = options;
+
+  const defaultClassNames = {
+    draggable: "draggy-draggable",
+    dropzone: "draggy-dropzone",
+    dragging: "draggy-dragging",
+    hovering: "draggy-hovering",
+    hovered: "draggy-hovered",
+  };
+  const classNames = {
+    ...defaultClassNames,
+    ...options.classNames,
+  };
+
+  const draggables = document.querySelectorAll(draggable);
+  for (let idx = 0; idx < draggables.length; idx++) {
+    const el = draggables[idx];
+    el.setAttribute("draggable", "true");
+    el.classList.add(classNames.draggable);
+  }
 
   addEventListener("dragstart", (ev) => {
     onDragStart?.();
@@ -24,47 +39,52 @@ function draggy({
     const t = ev.target as Element;
     dragged = t;
 
-    t.classList.add("draggy-dragging");
+    t.classList.add(classNames.dragging);
   });
 
   addEventListener("dragend", (ev) => {
     onDragEnd?.();
 
     const t = ev.target as Element;
-    t.classList.remove("draggy-dragging");
+    t.classList.remove(classNames.dragging);
   });
 
   addEventListener("dragleave", (ev) => {
     onDragLeave?.();
 
     const t = ev.target as Element;
-    t.classList.remove("draggy-hovered");
+    t.classList.remove(classNames.hovered);
 
-    dragged?.classList.remove("draggy-hovering");
+    dragged?.classList.remove(classNames.hovering);
   });
 
-  document.querySelectorAll(dropzone).forEach((el) => {
+  const dropzones = document.querySelectorAll(dropzone);
+  for (let idx = 0; idx < dropzones.length; idx++) {
+    const el = document.querySelectorAll(dropzone)[idx];
+
+    el.classList.add(classNames.dropzone);
+
     el.addEventListener("dragover", (ev) => {
       ev.preventDefault();
 
       onDragOver?.();
 
       const t = ev.target as Element;
-      t.classList.add("draggy-hovered");
+      t.classList.add(classNames.hovered);
 
-      dragged?.classList.add("draggy-hovering");
+      dragged?.classList.add(classNames.hovering);
     });
 
     el.addEventListener("drop", (ev) => {
       ev.preventDefault();
 
       const t = ev.target as Element;
-      t.classList.remove("draggy-hovered");
+      t.classList.remove(classNames.hovered);
 
       if (isDropzone({ el: t }) && dragged) {
         const handler = onDrop?.();
 
-        dragged.classList.remove("draggy-dragging", "draggy-hovering");
+        dragged.classList.remove(classNames.dragging, classNames.hovering);
 
         if (handler) {
           handler({ dragged, target: t });
@@ -73,7 +93,7 @@ function draggy({
         }
       }
     });
-  });
+  }
 }
 
 export { draggy };
