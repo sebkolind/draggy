@@ -1,7 +1,7 @@
 {
   "name": "@sebkolind/draggy",
   "version": "0.0.1",
-  "description": "A lightweight drag-and-drop library built with TypeScript.",
+  "description": "A lightweight drag&drop library built with TypeScript.",
   "source": "lib/main.ts",
   "module": "dist/draggy.js",
   "types": "dist/draggy.d.ts",
