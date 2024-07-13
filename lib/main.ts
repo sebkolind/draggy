@@ -7,10 +7,10 @@ function draggy(options: Options) {
     draggable,
     dropzone,
     isDropzone,
-    onDragStart,
-    onDragLeave,
-    onDragEnd,
-    onDragOver,
+    onStart,
+    onLeave,
+    onEnd,
+    onOver,
     onDrop,
   } = options;
 
@@ -34,7 +34,7 @@ function draggy(options: Options) {
   }
 
   addEventListener("dragstart", (ev) => {
-    onDragStart?.();
+    onStart?.();
 
     const t = ev.target as Element;
     dragged = t;
@@ -43,14 +43,14 @@ function draggy(options: Options) {
   });
 
   addEventListener("dragend", (ev) => {
-    onDragEnd?.();
+    onEnd?.();
 
     const t = ev.target as Element;
     t.classList.remove(classNames.dragging);
   });
 
   addEventListener("dragleave", (ev) => {
-    onDragLeave?.();
+    onLeave?.();
 
     const t = ev.target as Element;
     t.classList.remove(classNames.hovered);
@@ -67,7 +67,7 @@ function draggy(options: Options) {
     el.addEventListener("dragover", (ev) => {
       ev.preventDefault();
 
-      onDragOver?.();
+      onOver?.();
 
       const t = ev.target as Element;
       t.classList.add(classNames.hovered);

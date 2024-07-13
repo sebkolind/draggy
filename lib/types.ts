@@ -9,10 +9,10 @@ type Options = {
     hovering?: string;
     hovered?: string;
   };
-  onDragStart?: () => void;
-  onDragLeave?: () => void;
-  onDragEnd?: () => void;
-  onDragOver?: () => void;
+  onStart?: () => void;
+  onLeave?: () => void;
+  onEnd?: () => void;
+  onOver?: () => void;
   onDrop?: () =>
     | void
     | ((context: { dragged: Element; target: Element }) => void);
