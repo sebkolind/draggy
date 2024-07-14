@@ -11,7 +11,7 @@ const CLASSNAMES = {
 };
 
 function draggy(options: Options) {
-  let dragged: Element | null = null;
+  let dragged: HTMLElement | null = null;
   let clone: HTMLElement | null = null;
 
   const {
@@ -37,7 +37,7 @@ function draggy(options: Options) {
   addEventListener("dragstart", (e) => {
     onStart?.();
 
-    const t = e.target as Element;
+    const t = e.target as HTMLElement;
     dragged = t;
     t.classList.add(CLASSNAMES.dragging);
   });
@@ -64,25 +64,28 @@ function draggy(options: Options) {
     if (!el) return;
 
     el.classList.add(CLASSNAMES.dropzone);
+
+    const others = el.querySelectorAll(`.${CLASSNAMES.draggable}`);
+    if (others.length === 0) return;
+    const othersPos = Array.from(others).map((o, idx) => {
+      const rect = o.getBoundingClientRect();
+      return {
+        idx,
+        x: rect.x,
+        y: rect.y,
+        height: rect.height,
+        width: rect.width,
+        el: o,
+      };
+    });
+
     el.addEventListener("dragover", (e) => {
-      // the "dragover" event is not a DragEvent, for some reason...
       if (!(e instanceof DragEvent)) return;
 
       e.preventDefault();
 
-      // i might want to find a better way to do this,
-      // it's quite much on a 2ms loop [:
-      const others = el.querySelectorAll(`.${CLASSNAMES.draggable}`);
-      const othersPos = Array.from(others).map((o) => {
-        const rect = o.getBoundingClientRect();
-        return {
-          x: rect.x,
-          y: rect.y,
-          height: rect.height,
-          width: rect.width,
-          el: o,
-        };
-      });
+      el.classList.add(CLASSNAMES.hovered);
+      dragged?.classList.add(CLASSNAMES.hovering);
 
       onOver?.();
 
@@ -103,15 +106,20 @@ function draggy(options: Options) {
             clone.className = PLACEHOLDER_CN;
             clone.attributes.removeNamedItem("draggable");
           }
-          el.insertBefore(
-            clone,
-            y < op.y + op.height / 2 ? op.el : op.el.nextSibling,
-          );
+          const top = y < op.y + op.height / 2;
+          const where = top ? op.el : op.el.nextSibling;
+          if (
+            dragged === op.el ||
+            (dragged === op.el.nextElementSibling && !top) ||
+            (dragged === op.el.previousElementSibling && top)
+          ) {
+            return;
+          }
+          if (where === clone || where === clone.nextSibling) return;
+          el.insertBefore(clone, where);
+          return;
         }
       }
-
-      el.classList.add(CLASSNAMES.hovered);
-      dragged?.classList.add(CLASSNAMES.hovering);
     });
 
     el.addEventListener("drop", (e) => {
@@ -122,7 +130,7 @@ function draggy(options: Options) {
 
       if (
         (e.target.classList.contains(PLACEHOLDER_CN) ||
-          isDropzone({ el: e.target })) &&
+          isDropzone?.({ el: e.target })) &&
         dragged
       ) {
         onDrop?.();
