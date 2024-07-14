@@ -57,20 +57,20 @@ function draggy(options: Options) {
 
     el.classList.add(CLASSNAMES.dropzone);
 
-    const c: Child[] = [];
-    el.querySelectorAll(`.${CLASSNAMES.draggable}`).forEach((x) => {
-      const rect = x.getBoundingClientRect();
-      c.push({
-        x: rect.x,
-        y: rect.y,
-        height: rect.height,
-        width: rect.width,
-        el: x,
-      });
-    });
-
     el.addEventListener("dragover", (e) => {
       if (!(e instanceof DragEvent)) return;
+
+      const c: Child[] = [];
+      el.querySelectorAll(`.${CLASSNAMES.draggable}`).forEach((x) => {
+        const rect = x.getBoundingClientRect();
+        c.push({
+          x: rect.x,
+          y: rect.y,
+          height: rect.height,
+          width: rect.width,
+          el: x,
+        });
+      });
 
       e.preventDefault();
 
