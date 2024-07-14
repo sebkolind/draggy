@@ -2,5 +2,5 @@ import { draggy } from "@sebkolind/draggy";
 
 draggy({
   draggable: ".draggable",
-  dropzone: ".dropzone",
+  dropzone: ".column",
 });

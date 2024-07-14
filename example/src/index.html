@@ -25,24 +25,14 @@
 
       .draggable {
         margin-bottom: 10px;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #333;
+        padding: 12px;
       }
 
       .draggy-dragging {
         opacity: 0.5;
-        background-color: pink;
-      }
-
-      .draggy-dropzone {
-        padding: 12px;
-        border: 2px dashed blueviolet;
-        border-radius: 8px;
-      }
-
-      .draggy-hovered {
-        /* background-color: lightblue; */
-      }
-      .draggy-hovered * {
-        /* pointer-events: none; */
       }
 
       .container {
@@ -57,14 +47,15 @@
         text-align: center;
       }
 
-      .dropzones {
+      .columns {
         margin: 0 auto;
         display: flex;
         width: 800px;
-        gap: 8px;
+        gap: 18px;
       }
-      .dropzone {
+      .column {
         width: 33.333%;
+        border-radius: 8px;
       }
 
       .draggables {
@@ -79,12 +70,6 @@
         gap: 4px;
         margin-bottom: 24px;
       }
-      .draggable {
-        width: 233px;
-        border-radius: 8px;
-        border: 2px solid #000;
-        padding: 8px;
-      }
     </style>
   </head>
   <body>
@@ -93,19 +78,19 @@
         <h1>Draggy</h1>
         <p>Lightweight drag&drop library built with TypeScript.</p>
       </div>
-      <div class="dropzones">
-        <div class="dropzone">
+      <div class="columns">
+        <div class="column">
           <div class="draggable">I am draggable 5</div>
           <div class="draggable">I am draggable 6</div>
           <div class="draggable">I am draggable 7</div>
         </div>
-        <div class="dropzone">
+        <div class="column">
           <div class="draggable">I am draggable 1</div>
           <div class="draggable">I am draggable 2</div>
           <div class="draggable">I am draggable 3</div>
           <div class="draggable">I am draggable 4</div>
         </div>
-        <div class="dropzone">
+        <div class="column">
           <div class="draggable">I am draggable 8</div>
           <div class="draggable">I am draggable 9</div>
           <div class="draggable">I am draggable 10</div>
