@@ -39,7 +39,7 @@
       }
 
       .draggy-hovered {
-        background-color: lightblue;
+        /* background-color: lightblue; */
       }
       .draggy-hovered * {
         /* pointer-events: none; */
@@ -52,6 +52,8 @@
 
       .header {
         margin: 0 auto;
+        margin-top: 48px;
+        margin-bottom: 24px;
         text-align: center;
       }
 
@@ -91,20 +93,23 @@
         <h1>Draggy</h1>
         <p>Lightweight drag&drop library built with TypeScript.</p>
       </div>
-      <div class="draggables">
-        <div class="draggable">I am draggable 1</div>
-        <div class="draggable">I am draggable 2</div>
-        <div class="draggable">I am draggable 3</div>
-        <div class="draggable">I am draggable 4</div>
-      </div>
       <div class="dropzones">
         <div class="dropzone">
           <div class="draggable">I am draggable 5</div>
           <div class="draggable">I am draggable 6</div>
           <div class="draggable">I am draggable 7</div>
         </div>
-        <div class="dropzone">I am the dropzone #2</div>
-        <div class="dropzone">I am the dropzone #3</div>
+        <div class="dropzone">
+          <div class="draggable">I am draggable 1</div>
+          <div class="draggable">I am draggable 2</div>
+          <div class="draggable">I am draggable 3</div>
+          <div class="draggable">I am draggable 4</div>
+        </div>
+        <div class="dropzone">
+          <div class="draggable">I am draggable 8</div>
+          <div class="draggable">I am draggable 9</div>
+          <div class="draggable">I am draggable 10</div>
+        </div>
       </div>
     </div>
     <script type="module" src="main.ts"></script>
