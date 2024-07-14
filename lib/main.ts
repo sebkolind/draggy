@@ -1,4 +1,4 @@
-import { CLASSNAMES, PLACEHOLDER_CN } from "./constants";
+import { CLASSNAMES } from "./constants";
 import { Child, Options } from "./types";
 import { isElement } from "./utils";
 
@@ -94,7 +94,7 @@ function draggy(options: Options) {
           if (!clone) {
             clone = dragged?.cloneNode() as HTMLElement;
             clone.style.height = `${dragged?.scrollHeight}px`;
-            clone.className = PLACEHOLDER_CN;
+            clone.className = CLASSNAMES.placeholder;
             clone.attributes.removeNamedItem("draggable");
           }
           const top = y < op.y + op.height / 2;
@@ -120,13 +120,13 @@ function draggy(options: Options) {
       el.classList.remove(CLASSNAMES.hovered);
 
       if (
-        (e.target.classList.contains(PLACEHOLDER_CN) ||
+        (e.target.classList.contains(CLASSNAMES.placeholder) ||
           isDropzone?.({ el: e.target })) &&
         dragged
       ) {
         onDrop?.();
         dragged.classList.remove(CLASSNAMES.dragging, CLASSNAMES.hovering);
-        if (e.target.classList.contains(PLACEHOLDER_CN)) {
+        if (e.target.classList.contains(CLASSNAMES.placeholder)) {
           e.target.replaceWith(dragged);
         } else {
           e.target.append(dragged);
