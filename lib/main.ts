@@ -18,8 +18,8 @@ function draggy(options: Options) {
   } = options;
 
   const draggables = document.querySelectorAll(draggable);
-  for (let idx = 0; idx < draggables.length; idx++) {
-    const el = draggables[idx];
+  for (let i = 0; i < draggables.length; i++) {
+    const el = draggables[i];
     if (el) {
       el.setAttribute("draggable", "true");
       el.classList.add(CLASSNAMES.draggable);
@@ -51,8 +51,8 @@ function draggy(options: Options) {
   });
 
   const dropzones = document.querySelectorAll(dropzone);
-  for (let idx = 0; idx < dropzones.length; idx++) {
-    const el = dropzones[idx];
+  for (let i = 0; i < dropzones.length; i++) {
+    const el = dropzones[i];
     if (!el) return;
 
     el.classList.add(CLASSNAMES.dropzone);
