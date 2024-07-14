@@ -1,4 +1,4 @@
-import { Options } from "./types";
+import { Child, Options } from "./types";
 import { isElement } from "./utils";
 
 const PLACEHOLDER_CN = "draggy-placeholder";
@@ -65,18 +65,16 @@ function draggy(options: Options) {
 
     el.classList.add(CLASSNAMES.dropzone);
 
-    const others = el.querySelectorAll(`.${CLASSNAMES.draggable}`);
-    if (others.length === 0) return;
-    const othersPos = Array.from(others).map((o, idx) => {
-      const rect = o.getBoundingClientRect();
-      return {
-        idx,
+    const c: Child[] = [];
+    el.querySelectorAll(`.${CLASSNAMES.draggable}`).forEach((x) => {
+      const rect = x.getBoundingClientRect();
+      c.push({
         x: rect.x,
         y: rect.y,
         height: rect.height,
         width: rect.width,
-        el: o,
-      };
+        el: x,
+      });
     });
 
     el.addEventListener("dragover", (e) => {
@@ -91,8 +89,9 @@ function draggy(options: Options) {
 
       const x = e.clientX;
       const y = e.clientY;
-      for (let i = 0; i < othersPos.length; i++) {
-        const op = othersPos[i];
+      if (!c.length) return;
+      for (let i = 0; i < c.length; i++) {
+        const op = c[i];
         if (!op) return;
         if (
           x < op.x + op.width &&

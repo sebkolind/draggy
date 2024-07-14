@@ -9,4 +9,12 @@ type Options = {
   onDrop?: () => void;
 };
 
-export { Options };
+type Child = {
+  x: number;
+  y: number;
+  height: number;
+  width: number;
+  el: Element;
+};
+
+export { Options, Child };
