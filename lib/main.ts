@@ -1,14 +1,6 @@
+import { CLASSNAMES, PLACEHOLDER_CN } from "./constants";
 import { Child, Options } from "./types";
 import { isElement } from "./utils";
-
-const PLACEHOLDER_CN = "draggy-placeholder";
-const CLASSNAMES = {
-  draggable: "draggy-draggable",
-  dropzone: "draggy-dropzone",
-  dragging: "draggy-dragging",
-  hovering: "draggy-hovering",
-  hovered: "draggy-hovered",
-};
 
 function draggy(options: Options) {
   let dragged: HTMLElement | null = null;
