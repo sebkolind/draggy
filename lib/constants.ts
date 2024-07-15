@@ -4,7 +4,6 @@ const CLASSNAMES = {
   dragging: "draggy-dragging",
   origin: "draggy-origin",
   hovering: "draggy-hovering",
-  hovered: "draggy-hovered",
   placeholder: "draggy-placeholder",
 };
 

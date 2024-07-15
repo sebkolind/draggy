@@ -71,7 +71,7 @@ function draggy(options: Options) {
     onEnd?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(CLASSNAMES.origin, CLASSNAMES.hovered);
+    e.target.classList.remove(CLASSNAMES.origin);
     dragged?.classList.remove(CLASSNAMES.hovering);
     placeholder?.remove();
     shadow?.remove();
@@ -82,7 +82,6 @@ function draggy(options: Options) {
     onLeave?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(CLASSNAMES.hovered);
     dragged?.classList.remove(CLASSNAMES.hovering);
   });
 
@@ -110,7 +109,6 @@ function draggy(options: Options) {
 
       e.preventDefault();
 
-      el.classList.add(CLASSNAMES.hovered);
       dragged?.classList.add(CLASSNAMES.hovering);
 
       onOver?.();
@@ -153,9 +151,6 @@ function draggy(options: Options) {
     el.addEventListener("drop", (e) => {
       e.preventDefault();
       if (!isElement(e.target)) return;
-
-      el.classList.remove(CLASSNAMES.hovered);
-      e.target.classList.remove(CLASSNAMES.hovered);
 
       if (
         (e.target.classList.contains(CLASSNAMES.placeholder) ||
