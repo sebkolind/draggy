@@ -4,7 +4,6 @@ import { isElement } from "./utils";
 
 function draggy(options: Options) {
   let dragged: HTMLElement | null = null;
-  let placeholder: HTMLElement | null = null;
   let shadow: HTMLElement | null = null;
 
   const {
@@ -72,8 +71,6 @@ function draggy(options: Options) {
 
     if (!isElement(e.target)) return;
     e.target.classList.remove(CLASSNAMES.origin);
-    dragged?.classList.remove(CLASSNAMES.hovering);
-    placeholder?.remove();
     shadow?.remove();
     shadow = null;
   });
@@ -82,7 +79,6 @@ function draggy(options: Options) {
     onLeave?.();
 
     if (!isElement(e.target)) return;
-    dragged?.classList.remove(CLASSNAMES.hovering);
   });
 
   const dropzones = document.querySelectorAll(dropzone);
@@ -109,8 +105,6 @@ function draggy(options: Options) {
 
       e.preventDefault();
 
-      dragged?.classList.add(CLASSNAMES.hovering);
-
       onOver?.();
 
       const x = e.clientX;
@@ -125,12 +119,7 @@ function draggy(options: Options) {
           y < op.y + op.height &&
           y > op.y
         ) {
-          if (!placeholder) {
-            placeholder = dragged?.cloneNode() as HTMLElement;
-            placeholder.style.height = `${dragged?.scrollHeight}px`;
-            placeholder.className = CLASSNAMES.placeholder;
-            placeholder.attributes.removeNamedItem("draggable");
-          }
+          if (!dragged) return;
           const top = y < op.y + op.height / 2;
           const where = top ? op.el : op.el.nextSibling;
           if (
@@ -140,9 +129,8 @@ function draggy(options: Options) {
           ) {
             return;
           }
-          if (where === placeholder || where === placeholder.nextSibling)
-            return;
-          el.insertBefore(placeholder, where);
+          if (where === dragged || where === dragged.nextSibling) return;
+          el.insertBefore(dragged, where);
           return;
         }
       }
@@ -153,18 +141,12 @@ function draggy(options: Options) {
       if (!isElement(e.target)) return;
 
       if (
-        (e.target.classList.contains(CLASSNAMES.placeholder) ||
-          e.target.classList.contains(CLASSNAMES.dropzone) ||
+        (e.target.classList.contains(CLASSNAMES.dropzone) ||
           isDropzone?.({ el: e.target })) &&
         dragged
       ) {
         onDrop?.();
-        dragged.classList.remove(CLASSNAMES.origin, CLASSNAMES.hovering);
-        if (e.target.classList.contains(CLASSNAMES.placeholder)) {
-          e.target.replaceWith(dragged);
-        } else {
-          e.target.append(dragged);
-        }
+        dragged.classList.remove(CLASSNAMES.origin);
       }
     });
   }
