@@ -4,7 +4,7 @@ import { isElement } from "./utils";
 
 function draggy(options: Options) {
   let dragged: HTMLElement | null = null;
-  let clone: HTMLElement | null = null;
+  let placeholder: HTMLElement | null = null;
   let shadow: HTMLElement | null = null;
 
   const {
@@ -72,7 +72,7 @@ function draggy(options: Options) {
 
     if (!isElement(e.target)) return;
     e.target.classList.remove(CLASSNAMES.origin);
-    clone?.remove();
+    placeholder?.remove();
     shadow?.remove();
     shadow = null;
   });
@@ -126,11 +126,11 @@ function draggy(options: Options) {
           y < op.y + op.height &&
           y > op.y
         ) {
-          if (!clone) {
-            clone = dragged?.cloneNode() as HTMLElement;
-            clone.style.height = `${dragged?.scrollHeight}px`;
-            clone.className = CLASSNAMES.placeholder;
-            clone.attributes.removeNamedItem("draggable");
+          if (!placeholder) {
+            placeholder = dragged?.cloneNode() as HTMLElement;
+            placeholder.style.height = `${dragged?.scrollHeight}px`;
+            placeholder.className = CLASSNAMES.placeholder;
+            placeholder.attributes.removeNamedItem("draggable");
           }
           const top = y < op.y + op.height / 2;
           const where = top ? op.el : op.el.nextSibling;
@@ -141,8 +141,9 @@ function draggy(options: Options) {
           ) {
             return;
           }
-          if (where === clone || where === clone.nextSibling) return;
-          el.insertBefore(clone, where);
+          if (where === placeholder || where === placeholder.nextSibling)
+            return;
+          el.insertBefore(placeholder, where);
           return;
         }
       }
@@ -150,8 +151,8 @@ function draggy(options: Options) {
 
     el.addEventListener("drop", (e) => {
       e.preventDefault();
-
       if (!isElement(e.target)) return;
+
       el.classList.remove(CLASSNAMES.hovered);
 
       if (
