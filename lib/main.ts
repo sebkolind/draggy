@@ -5,6 +5,7 @@ import { isElement } from "./utils";
 function draggy(options: Options) {
   let dragged: HTMLElement | null = null;
   let clone: HTMLElement | null = null;
+  let shadow: HTMLElement | null = null;
 
   const {
     draggable,
@@ -30,16 +31,50 @@ function draggy(options: Options) {
     onStart?.();
 
     const t = e.target as HTMLElement;
+
+    if (!shadow) {
+      shadow = t.cloneNode(true) as HTMLElement;
+      shadow.classList.add(CLASSNAMES.dragging);
+      shadow.style.position = "absolute";
+      shadow.style.pointerEvents = "none";
+      shadow.style.width = `${t.clientWidth}px`;
+      shadow.style.height = `${t?.clientHeight}px`;
+      shadow.style.opacity = "0";
+      document.body.append(shadow);
+    }
+
     dragged = t;
-    t.classList.add(CLASSNAMES.dragging);
+    t.classList.add(CLASSNAMES.origin);
+
+    e.dataTransfer?.setDragImage(shadow, 0, 0);
+    const rect = t.getBoundingClientRect();
+    const offsets = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    document.addEventListener("dragover", (e) =>
+      updateShadowPosition(e, offsets),
+    );
   });
+
+  const updateShadowPosition = (
+    e: DragEvent,
+    offsets: { x: number; y: number },
+  ) => {
+    e.preventDefault();
+    const x = e.clientX;
+    const y = e.clientY;
+    if (!shadow) return;
+    shadow.style.opacity = "1";
+    shadow.style.left = `${x - offsets.x}px`;
+    shadow.style.top = `${y - offsets.y}px`;
+  };
 
   addEventListener("dragend", (e) => {
     onEnd?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(CLASSNAMES.dragging);
+    e.target.classList.remove(CLASSNAMES.origin);
     clone?.remove();
+    shadow?.remove();
+    shadow = null;
   });
 
   addEventListener("dragleave", (e) => {
@@ -125,7 +160,7 @@ function draggy(options: Options) {
         dragged
       ) {
         onDrop?.();
-        dragged.classList.remove(CLASSNAMES.dragging, CLASSNAMES.hovering);
+        dragged.classList.remove(CLASSNAMES.origin, CLASSNAMES.hovering);
         if (e.target.classList.contains(CLASSNAMES.placeholder)) {
           e.target.replaceWith(dragged);
         } else {
