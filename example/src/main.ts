@@ -1,6 +1,6 @@
 import { draggy } from "@sebkolind/draggy";
 
 draggy({
-  draggable: ".draggable",
+  draggable: ".card",
   dropzone: ".column",
 });

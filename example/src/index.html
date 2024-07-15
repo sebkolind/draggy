@@ -12,8 +12,9 @@
     />
     <style>
       body {
-        font-family: "Inter", sans-serif;
+        font-family: "SF Pro", sans-serif;
         font-size: 16px;
+        line-height: 1.25;
         color: #fff;
         margin: 0;
         padding: 0;
@@ -22,16 +23,6 @@
 
       * {
         box-sizing: border-box;
-      }
-
-      .draggable {
-        margin-bottom: 10px;
-        width: 100%;
-        border-radius: 8px;
-        border: 1px solid #333;
-        background-color: #1b1b1b;
-        padding: 12px;
-        font-size: 14px;
       }
 
       .draggy-origin {
@@ -63,16 +54,120 @@
         margin-bottom: 32px;
         text-align: center;
       }
+      .header h1 {
+        margin-bottom: 0;
+      }
+
+      .wrap {
+        width: 800px;
+        font-size: 14px;
+        margin: 0 auto;
+      }
+
+      .filters {
+        display: flex;
+        gap: 4px;
+        padding: 0 8px;
+        margin-bottom: 12px;
+      }
+      .filters .people {
+        display: flex;
+        gap: 4px;
+      }
+      .filters .people button {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+        padding: 4px 6px;
+        border-radius: 8px;
+        background-color: transparent;
+        border: 1px solid #333;
+        color: #fff;
+        cursor: pointer;
+        transition: opacity 0.3s;
+      }
+      .filters .people button:hover {
+        opacity: 1 !important;
+      }
+      .filters .people button * {
+        pointer-events: none;
+      }
+      .filters .people button img {
+        width: 20px;
+        height: 20px;
+        border-radius: 20px;
+        background-color: #333;
+      }
+      .filters .people button .count {
+        background-color: #333;
+        margin-left: 2px;
+        line-height: 1;
+        color: #fff;
+        width: 16px;
+        height: 16px;
+        border-radius: 16px;
+        padding-right: 1px;
+        padding-bottom: 1px;
+        transform: translate(1px, 1px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+      }
 
       .columns {
-        margin: 0 auto;
         display: flex;
-        width: 800px;
       }
       .column {
         width: 33.333%;
         padding: 8px;
         border-radius: 8px;
+      }
+
+      .card {
+        margin-bottom: 10px;
+        width: 100%;
+        border-radius: 8px;
+        border: 1px solid #333;
+        background-color: #1b1b1b;
+        padding: 12px;
+        transition: opacity 0.3s;
+      }
+      .card p {
+        margin: 0 0 12px 0;
+      }
+      .footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .status {
+        font-size: 12px;
+        border-radius: 4px;
+        padding: 2 4px;
+        display: inline;
+      }
+      .status.to-do {
+        background-color: #1d3557;
+      }
+      .status.in-progress {
+        background-color: #6a1b9a;
+      }
+      .status.done {
+        background-color: #3a5a40;
+      }
+      .author {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 12px;
+      }
+      .author img {
+        width: 20px;
+        height: 20px;
+        border-radius: 20px;
+        background-color: #333;
       }
 
       .draggables {
@@ -88,29 +183,231 @@
         margin-bottom: 24px;
       }
     </style>
+    <script>
+      function onFilterClick(e) {
+        const cards = document.querySelectorAll(".card");
+        const filters = document.querySelectorAll(".filters button");
+
+        if (e.target.classList.contains("active")) {
+          e.target.classList.remove("active");
+          filters.forEach((filter) => {
+            filter.style.opacity = "1";
+          });
+          cards.forEach((card) => {
+            card.style.opacity = "1";
+          });
+          return;
+        }
+
+        filters.forEach((filter) => {
+          filter.classList.remove("active");
+          filter.style.opacity = "0.25";
+        });
+        e.target.classList.add("active");
+        e.target.style.opacity = "1";
+        cards.forEach((card) => {
+          const author = card.querySelector(".author");
+          if (author && !author.textContent.includes(e.target.dataset.author)) {
+            card.style.opacity = "0.25";
+          } else {
+            card.style.opacity = "1";
+          }
+        });
+      }
+    </script>
   </head>
   <body>
     <div class="container">
       <div class="header">
         <h1>Draggy</h1>
-        <p>Lightweight drag&drop library built with TypeScript.</p>
+        <p>A lightweight drag&drop library built with TypeScript.</p>
       </div>
-      <div class="columns">
-        <div class="column">
-          <div class="draggable">I am draggable 5</div>
-          <div class="draggable">I am draggable 6</div>
-          <div class="draggable">I am draggable 7</div>
+      <div class="wrap">
+        <div class="filters">
+          <div class="people">
+            <button onclick="onFilterClick(event)" data-author="Ava">
+              <img
+                src="./assets/profile-picture-1.jpg"
+                alt="Profile Picture"
+                width="20px"
+                height="20px"
+              />
+              Ava
+              <div class="count">4</div>
+            </button>
+            <button onclick="onFilterClick(event)" data-author="Max">
+              <img
+                src="./assets/profile-picture-2.jpg"
+                alt="Profile Picture"
+                width="20px"
+                height="20px"
+              />
+              Max
+              <div class="count">1</div>
+            </button>
+            <button onclick="onFilterClick(event)" data-author="John">
+              <img
+                src="./assets/profile-picture-4.jpg"
+                alt="Profile Picture"
+                width="20px"
+                height="20px"
+              />
+              John
+              <div class="count">2</div>
+            </button>
+            <button onclick="onFilterClick(event)" data-author="Ben">
+              <img
+                src="./assets/profile-picture-3.jpg"
+                alt="Profile Picture"
+                width="20px"
+                height="20px"
+              />
+              Ben
+              <div class="count">2</div>
+            </button>
+          </div>
         </div>
-        <div class="column">
-          <div class="draggable">I am draggable 1</div>
-          <div class="draggable">I am draggable 2</div>
-          <div class="draggable">I am draggable 3</div>
-          <div class="draggable">I am draggable 4</div>
-        </div>
-        <div class="column">
-          <div class="draggable">I am draggable 8</div>
-          <div class="draggable">I am draggable 9</div>
-          <div class="draggable">I am draggable 10</div>
+        <div class="columns">
+          <div class="column">
+            <div class="card">
+              <p>Announce the v0.0.1 release</p>
+              <div class="footer">
+                <div class="status to-do">To-do</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-2.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Max
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Find a way to do Themes easily</p>
+              <div class="footer">
+                <div class="status to-do">To-do</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-4.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  John
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Add possibility for dragging multiple cards</p>
+              <div class="footer">
+                <div class="status to-do">To-do</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-1.jpg"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ava
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Setup CI/CD</p>
+              <div class="footer">
+                <div class="status to-do">To-do</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-3.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ben
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="card">
+              <p>Release v0.0.1</p>
+              <div class="footer">
+                <div class="status in-progress">In Progress</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-3.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ben
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Create and write the CHANGELOG.md</p>
+              <div class="footer">
+                <div class="status in-progress">In Progress</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-1.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ava
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="column">
+            <div class="card">
+              <p>Create repository and setup project</p>
+              <div class="footer">
+                <div class="status done">Done</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-4.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  John
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Build the MVP</p>
+              <div class="footer">
+                <div class="status done">Done</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-1.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ava
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <p>Polish the example project</p>
+              <div class="footer">
+                <div class="status done">Done</div>
+                <div class="author">
+                  <img
+                    src="./assets/profile-picture-1.jpg"
+                    alt="Profile Picture"
+                    width="20px"
+                    height="20px"
+                  />
+                  Ava
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
