@@ -71,7 +71,8 @@ function draggy(options: Options) {
     onEnd?.();
 
     if (!isElement(e.target)) return;
-    e.target.classList.remove(CLASSNAMES.origin);
+    e.target.classList.remove(CLASSNAMES.origin, CLASSNAMES.hovered);
+    dragged?.classList.remove(CLASSNAMES.hovering);
     placeholder?.remove();
     shadow?.remove();
     shadow = null;
@@ -154,9 +155,11 @@ function draggy(options: Options) {
       if (!isElement(e.target)) return;
 
       el.classList.remove(CLASSNAMES.hovered);
+      e.target.classList.remove(CLASSNAMES.hovered);
 
       if (
         (e.target.classList.contains(CLASSNAMES.placeholder) ||
+          e.target.classList.contains(CLASSNAMES.dropzone) ||
           isDropzone?.({ el: e.target })) &&
         dragged
       ) {
