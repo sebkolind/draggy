@@ -17,16 +17,7 @@ function draggy(options: Options) {
     onDrop,
   } = options;
 
-  const draggables = document.querySelectorAll(draggable);
-  for (let i = 0; i < draggables.length; i++) {
-    const el = draggables[i];
-    if (el) {
-      el.setAttribute("draggable", "true");
-      el.classList.add(CLASSNAMES.draggable);
-    }
-  }
-
-  addEventListener("dragstart", (e) => {
+  const setup = (e: DragEvent) => {
     onStart?.();
 
     const t = e.target as HTMLElement;
@@ -43,7 +34,7 @@ function draggy(options: Options) {
     }
 
     dragged = t;
-    t.classList.add(CLASSNAMES.origin);
+    dragged.classList.add(CLASSNAMES.origin);
 
     e.dataTransfer?.setDragImage(shadow, 0, 0);
     const rect = t.getBoundingClientRect();
@@ -51,7 +42,7 @@ function draggy(options: Options) {
     document.addEventListener("dragover", (e) =>
       updateShadowPosition(e, offsets),
     );
-  });
+  };
 
   const updateShadowPosition = (
     e: DragEvent,
@@ -66,7 +57,17 @@ function draggy(options: Options) {
     shadow.style.top = `${y - offsets.y}px`;
   };
 
-  addEventListener("dragend", (e) => {
+  const draggables = document.querySelectorAll(draggable);
+  for (let i = 0; i < draggables.length; i++) {
+    const el = draggables[i];
+    if (el) {
+      el.setAttribute("draggable", "true");
+      el.classList.add(CLASSNAMES.draggable);
+      el.addEventListener("dragstart", (e) => setup(e as DragEvent));
+    }
+  }
+
+  document.addEventListener("dragend", (e) => {
     onEnd?.();
 
     if (!isElement(e.target)) return;
@@ -75,7 +76,7 @@ function draggy(options: Options) {
     shadow = null;
   });
 
-  addEventListener("dragleave", (e) => {
+  document.addEventListener("dragleave", (e) => {
     onLeave?.();
 
     if (!isElement(e.target)) return;
