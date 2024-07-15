@@ -1,7 +1,7 @@
 type Options = {
   draggable: string;
   dropzone: string;
-  isDropzone?: (context: { el: Element }) => boolean;
+  isDropzone?: (context: Event) => boolean;
   onStart?: () => void;
   onLeave?: () => void;
   onEnd?: () => void;

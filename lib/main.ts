@@ -141,8 +141,7 @@ function draggy(options: Options) {
       if (!isElement(e.target)) return;
 
       if (
-        (e.target.classList.contains(CLASSNAMES.dropzone) ||
-          isDropzone?.({ el: e.target })) &&
+        (e.target.classList.contains(CLASSNAMES.dropzone) || isDropzone?.(e)) &&
         dragged
       ) {
         onDrop?.();
