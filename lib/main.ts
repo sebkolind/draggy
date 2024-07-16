@@ -159,10 +159,10 @@ function draggy(options: Options) {
       e.preventDefault();
       if (!isElement(e.target)) return;
 
-      if (
-        (e.target.classList.contains(CLASSNAMES.dropzone) || isDropzone?.(e)) &&
-        dragged
-      ) {
+      const valid = isDropzone
+        ? isDropzone(e)
+        : e.target.classList.contains(CLASSNAMES.dropzone);
+      if (valid && dragged) {
         onDrop?.();
         dragged.classList.remove(CLASSNAMES.origin);
       }
