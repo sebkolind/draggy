@@ -14,7 +14,9 @@ npm i @sebkolind/draggy
 import { draggy } from "@sebkolind/draggy";
 
 draggy({
-  draggable: ".draggable",
-  dropzone: ".dropzone",
+  // `target` can be a selector, an element or an array of elements
+  target: ".column",
+  // or, document.querySelector(".column")
+  // or, document.querySelectorAll(".column")
 });
 ```

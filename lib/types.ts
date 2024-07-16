@@ -1,6 +1,5 @@
 type Options = {
-  draggable: string;
-  dropzone: string;
+  target: string | Element | Element[] | NodeListOf<Element> | null;
   isDropzone?: (context: Event) => boolean;
   onStart?: () => void;
   onLeave?: () => void;

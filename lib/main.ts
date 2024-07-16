@@ -6,18 +6,18 @@ function draggy(options: Options) {
   let dragged: HTMLElement | null = null;
   let shadow: HTMLElement | null = null;
 
-  const {
-    draggable,
-    dropzone,
-    isDropzone,
-    onStart,
-    onLeave,
-    onEnd,
-    onOver,
-    onDrop,
-  } = options;
+  const { target, isDropzone, onStart, onLeave, onEnd, onOver, onDrop } =
+    options;
 
-  const setup = (e: DragEvent) => {
+  if (!target) {
+    return;
+  }
+
+  const setup = (e: DragEvent, c: Element) => {
+    if (e.target !== c) {
+      e.preventDefault();
+    }
+
     onStart?.();
 
     const t = e.target as HTMLElement;
@@ -27,8 +27,7 @@ function draggy(options: Options) {
       shadow.classList.add(CLASSNAMES.dragging);
       shadow.style.position = "absolute";
       shadow.style.pointerEvents = "none";
-      shadow.style.width = `${t.clientWidth}px`;
-      shadow.style.height = `${t?.clientHeight}px`;
+      shadow.style.width = `${t.offsetWidth}px`;
       shadow.style.opacity = "0";
       document.body.append(shadow);
     }
@@ -36,7 +35,13 @@ function draggy(options: Options) {
     dragged = t;
     dragged.classList.add(CLASSNAMES.origin);
 
-    e.dataTransfer?.setDragImage(shadow, 0, 0);
+    const fake = document.createElement("img");
+    fake.src =
+      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+    fake.style.opacity = "0";
+    e.dataTransfer?.setData("text/plain", "");
+    e.dataTransfer?.setDragImage(fake, 0, 0);
+
     const rect = t.getBoundingClientRect();
     const offsets = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     document.addEventListener("dragover", (e) =>
@@ -57,16 +62,6 @@ function draggy(options: Options) {
     shadow.style.top = `${y - offsets.y}px`;
   };
 
-  const draggables = document.querySelectorAll(draggable);
-  for (let i = 0; i < draggables.length; i++) {
-    const el = draggables[i];
-    if (el) {
-      el.setAttribute("draggable", "true");
-      el.classList.add(CLASSNAMES.draggable);
-      el.addEventListener("dragstart", (e) => setup(e as DragEvent));
-    }
-  }
-
   document.addEventListener("dragend", (e) => {
     onEnd?.();
 
@@ -82,10 +77,24 @@ function draggy(options: Options) {
     if (!isElement(e.target)) return;
   });
 
-  const dropzones = document.querySelectorAll(dropzone);
+  const dropzones =
+    typeof target === "string"
+      ? document.querySelectorAll(target)
+      : target instanceof NodeList || Array.isArray(target)
+        ? target
+        : [target];
   for (let i = 0; i < dropzones.length; i++) {
     const el = dropzones[i];
     if (!el) return;
+
+    const children = el.children;
+    for (let i = 0; i < children.length; i++) {
+      const c = children[i];
+      if (!c) return;
+      c.setAttribute("draggable", "true");
+      c.classList.add(CLASSNAMES.draggable);
+      c.addEventListener("dragstart", (e) => setup(e as DragEvent, c));
+    }
 
     el.classList.add(CLASSNAMES.dropzone);
 
