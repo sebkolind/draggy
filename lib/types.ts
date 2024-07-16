@@ -1,11 +1,11 @@
 type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
-  isDropzone?: (context: Event) => boolean;
-  onStart?: () => void;
-  onLeave?: () => void;
-  onEnd?: () => void;
-  onOver?: () => void;
-  onDrop?: () => void;
+  isDropzone?: (event: Event) => boolean;
+  onStart?: (event: Event) => void;
+  onLeave?: (event: Event) => void;
+  onEnd?: (event: Event) => void;
+  onOver?: (event: Event) => void;
+  onDrop?: (event: Event) => void;
 };
 
 type Child = {

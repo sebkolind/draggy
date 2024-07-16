@@ -18,7 +18,7 @@ function draggy(options: Options) {
       e.preventDefault();
     }
 
-    onStart?.();
+    onStart?.(e);
 
     const t = e.target as HTMLElement;
 
@@ -72,7 +72,7 @@ function draggy(options: Options) {
   };
 
   document.addEventListener("dragend", (e) => {
-    onEnd?.();
+    onEnd?.(e);
 
     if (!isElement(e.target)) return;
     e.target.classList.remove(CLASSNAMES.origin);
@@ -81,7 +81,7 @@ function draggy(options: Options) {
   });
 
   document.addEventListener("dragleave", (e) => {
-    onLeave?.();
+    onLeave?.(e);
 
     if (!isElement(e.target)) return;
   });
@@ -124,7 +124,7 @@ function draggy(options: Options) {
 
       e.preventDefault();
 
-      onOver?.();
+      onOver?.(e);
 
       const x = e.clientX;
       const y = e.clientY;
@@ -172,7 +172,7 @@ function draggy(options: Options) {
         ? isDropzone(e)
         : e.target.classList.contains(CLASSNAMES.dropzone);
       if (valid && dragged) {
-        onDrop?.();
+        onDrop?.(e);
         dragged.classList.remove(CLASSNAMES.origin);
       }
     });

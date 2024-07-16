@@ -29,14 +29,15 @@ draggy({
   // NOTE: Overrides the default validation behavior
   isDropzone: (event) => event.target.classList.contains("dropzone"),
   // (optional)
-  onStart: () => console.log("On drag start"),
+  onStart: (event) => console.log("On drag start"),
   // (optional)
-  onLeave: () => console.log("On leaving a valid drop target"),
+  onLeave: (event) => console.log("On leaving a valid drop target"),
   // (optional)
-  onEnd: () => console.log("On drag end"),
+  onEnd: (event) => console.log("On drag end"),
   // (optional)
-  onOver: () => console.log("On hovering draggable over a valid drop target"),
+  onOver: (event) =>
+    console.log("On hovering draggable over a valid drop target"),
   // (optional)
-  onDrop: () => console.log("On drop"),
+  onDrop: (event) => console.log("On drop"),
 });
 ```
