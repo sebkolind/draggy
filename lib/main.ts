@@ -129,6 +129,7 @@ function draggy(options: Options) {
       const x = e.clientX;
       const y = e.clientY;
       if (!c.length) return;
+      if (!dragged) return;
       for (let i = 0; i < c.length; i++) {
         const op = c[i];
         if (!op) return;
@@ -138,7 +139,6 @@ function draggy(options: Options) {
           y < op.y + op.height &&
           y > op.y
         ) {
-          if (!dragged) return;
           const top = y < op.y + op.height / 2;
           const where = top ? op.el : op.el.nextSibling;
           if (
@@ -151,6 +151,15 @@ function draggy(options: Options) {
           if (where === dragged || where === dragged.nextSibling) return;
           el.insertBefore(dragged, where);
           return;
+        }
+
+        if (!isElement(e.target)) return;
+        if (el.contains(dragged)) continue;
+        const valid = isDropzone
+          ? isDropzone(e)
+          : e.target.classList.contains(CLASSNAMES.dropzone);
+        if (valid) {
+          el.append(dragged);
         }
       }
     });
