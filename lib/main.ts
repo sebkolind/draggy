@@ -35,12 +35,16 @@ function draggy(options: Options) {
     dragged = t;
     dragged.classList.add(CLASSNAMES.origin);
 
-    const fake = document.createElement("img");
-    fake.src =
-      "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-    fake.style.opacity = "0";
-    e.dataTransfer?.setData("text/plain", "");
-    e.dataTransfer?.setDragImage(fake, 0, 0);
+    if (e.dataTransfer) {
+      const fake = document.createElement("img");
+      fake.src =
+        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
+      fake.style.opacity = "0";
+      e.dataTransfer.setData("text/plain", "");
+      e.dataTransfer.setDragImage(fake, 0, 0);
+      e.dataTransfer.dropEffect = "move";
+      e.dataTransfer.effectAllowed = "move";
+    }
 
     const rect = t.getBoundingClientRect();
     const offsets = { x: e.clientX - rect.left, y: e.clientY - rect.top };
