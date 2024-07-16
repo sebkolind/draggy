@@ -54,12 +54,13 @@ function draggy(options: Options) {
     offsets: { x: number; y: number },
   ) => {
     e.preventDefault();
+    if (!shadow) return;
     const x = e.clientX;
     const y = e.clientY;
-    if (!shadow) return;
+    const scroll = { x: scrollX, y: scrollY };
     shadow.style.opacity = "1";
-    shadow.style.left = `${x - offsets.x}px`;
-    shadow.style.top = `${y - offsets.y}px`;
+    shadow.style.left = `${x - offsets.x + scroll.x}px`;
+    shadow.style.top = `${y - offsets.y + scroll.y}px`;
   };
 
   document.addEventListener("dragend", (e) => {
