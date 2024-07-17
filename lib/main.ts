@@ -144,16 +144,16 @@ function draggy(options: Options) {
           y < op.y + op.height &&
           y > op.y
         ) {
-          const top = y < op.y + op.height / 2;
-          const where = top ? op.el : op.el.nextSibling;
+          const dir = y < op.y + op.height / 2 || x < op.x + op.width / 2;
+          const where = dir ? op.el : op.el.nextSibling;
           if (
             dragged === op.el ||
-            (dragged === op.el.nextElementSibling && !top) ||
-            (dragged === op.el.previousElementSibling && top)
+            (dragged === op.el.nextElementSibling && !dir) ||
+            (dragged === op.el.previousElementSibling && dir)
           ) {
-            return;
+            continue;
           }
-          if (where === dragged || where === dragged.nextSibling) return;
+          if (where === dragged || where === dragged.nextSibling) continue;
           el.insertBefore(dragged, where);
           return;
         }
