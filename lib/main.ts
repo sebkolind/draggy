@@ -31,6 +31,7 @@ function draggy(options: Options) {
       shadow.style.position = "absolute";
       shadow.style.pointerEvents = "none";
       shadow.style.width = `${t.offsetWidth}px`;
+      shadow.style.height = `${t.offsetHeight}px`;
       shadow.style.opacity = "0";
       document.body.append(shadow);
     }
