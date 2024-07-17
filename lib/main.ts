@@ -89,7 +89,7 @@ function draggy(options: Options) {
     for (let i = 0; i < allChildren.length; i++) {
       const c = allChildren[i];
       if (c && isElement(c)) {
-        c.style.removeProperty("pointer-events");
+        c.style.pointerEvents = "";
         if (c.style.length === 0) c.removeAttribute("style");
       }
     }
