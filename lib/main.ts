@@ -8,6 +8,8 @@ function draggy(options: Options) {
   // The next sibling of the dragged element.
   // Used to put the element back if a drop fails etc.
   let nextSibling: Element | null = null;
+  // All children of the targets
+  let allChildren: Element[] = [];
   // The dragged element.
   let dragged: HTMLElement | null = null;
   // The shadow element that follows the cursor.
@@ -83,6 +85,14 @@ function draggy(options: Options) {
     shadow?.remove();
     shadow = null;
     dragged = null;
+
+    for (let i = 0; i < allChildren.length; i++) {
+      const c = allChildren[i];
+      if (c && isElement(c)) {
+        c.style.removeProperty("pointer-events");
+        if (c.style.length === 0) c.removeAttribute("style");
+      }
+    }
   });
 
   document.addEventListener("dragleave", (e) => {
@@ -95,29 +105,34 @@ function draggy(options: Options) {
       : target instanceof NodeList || Array.isArray(target)
         ? target
         : [target];
-  for (let i = 0; i < dropzones.length; i++) {
-    const el = dropzones[i];
-    if (!el) return;
 
-    const children = el.children;
+  for (let i = 0; i < dropzones.length; i++) {
+    const dz = dropzones[i];
+    if (!dz) return;
+
+    const children = dz.children;
     for (let i = 0; i < children.length; i++) {
       const c = children[i];
       if (!c) return;
+
+      allChildren.push(c);
       c.setAttribute("draggable", "true");
       c.classList.add(CLASSNAMES.draggable);
       c.addEventListener("dragstart", (e) =>
-        setupDragStart(e as DragEvent, c, el),
+        setupDragStart(e as DragEvent, c, dz),
       );
     }
 
-    el.classList.add(CLASSNAMES.dropzone);
+    dz.classList.add(CLASSNAMES.dropzone);
 
-    el.addEventListener("dragover", (e) => {
-      if (!(e instanceof DragEvent)) return;
-      if (!dragged) return;
+    dz.addEventListener("dragover", (e) => {
+      if (!(e instanceof DragEvent) || !dragged || !children) return;
 
       const c: Child[] = [];
-      el.querySelectorAll(`.${CLASSNAMES.draggable}`).forEach((x) => {
+      for (let i = 0; i < children.length; i++) {
+        const x = children[i];
+        if (!x) return;
+
         const rect = x.getBoundingClientRect();
         c.push({
           x: rect.x,
@@ -126,11 +141,12 @@ function draggy(options: Options) {
           width: rect.width,
           el: x,
         });
-      });
+        // Allow dropping on other draggables
+        if (isElement(x) && dragged !== x) x.style.pointerEvents = "none";
+      }
       if (!c.length) return;
 
       e.preventDefault();
-
       onOver?.(e);
 
       const x = e.clientX;
@@ -155,30 +171,31 @@ function draggy(options: Options) {
             continue;
           }
           if (where === dragged || where === dragged.nextSibling) continue;
-          el.insertBefore(dragged, where);
+          dz.insertBefore(dragged, where);
           return;
         }
 
-        if (el.contains(dragged)) continue;
-        el.append(dragged);
-      }
-    });
-
-    el.addEventListener("drop", (e) => {
-      e.preventDefault();
-      if (!isElement(e.target) || !dragged || !parent) return;
-
-      const valid =
-        e.target.classList.contains(CLASSNAMES.dropzone) ||
-        e.target.classList.contains(CLASSNAMES.origin);
-      if (valid) {
-        onDrop?.(e);
-      } else {
-        // Return dragged to it's position before dragstart
-        parent.insertBefore(dragged, nextSibling);
+        // Will append if not close to other draggables
+        if (dz.contains(dragged)) continue;
+        dz.append(dragged);
       }
     });
   }
+
+  document.addEventListener("drop", (e) => {
+    e.preventDefault();
+    if (!isElement(e.target) || !dragged || !parent) return;
+
+    if (
+      e.target.classList.contains(CLASSNAMES.dropzone) ||
+      e.target.classList.contains(CLASSNAMES.origin)
+    ) {
+      onDrop?.(e);
+    } else {
+      // Return dragged to it's position before dragstart
+      parent.insertBefore(dragged, nextSibling);
+    }
+  });
 }
 
 export { draggy };

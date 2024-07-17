@@ -1,5 +1,5 @@
-const isElement = (target: EventTarget | null): target is Element => {
-  return target instanceof Element;
+const isElement = (target: EventTarget | null): target is HTMLElement => {
+  return target instanceof HTMLElement;
 };
 
 export { isElement };
