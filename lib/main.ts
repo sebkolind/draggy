@@ -3,20 +3,23 @@ import { Child, Options } from "./types";
 import { isElement } from "./utils";
 
 function draggy(options: Options) {
+  // The original parent when starting to drag
+  let parent: Element | null = null;
+  // The next sibling of the dragged element.
+  // Used to put the element back if a drop fails etc.
+  let nextSibling: Element | null = null;
+  // The dragged element.
   let dragged: HTMLElement | null = null;
+  // The shadow element that follows the cursor.
   let shadow: HTMLElement | null = null;
 
-  const { target, isDropzone, onStart, onLeave, onEnd, onOver, onDrop } =
-    options;
+  const { target, onStart, onLeave, onEnd, onOver, onDrop } = options;
 
-  if (!target) {
-    return;
-  }
+  const setupDragStart = (e: DragEvent, c: Element, p: Element) => {
+    if (e.target !== c) e.preventDefault();
 
-  const setup = (e: DragEvent, c: Element) => {
-    if (e.target !== c) {
-      e.preventDefault();
-    }
+    parent = p;
+    nextSibling = c.nextElementSibling;
 
     onStart?.(e);
 
@@ -78,12 +81,11 @@ function draggy(options: Options) {
     e.target.classList.remove(CLASSNAMES.origin);
     shadow?.remove();
     shadow = null;
+    dragged = null;
   });
 
   document.addEventListener("dragleave", (e) => {
     onLeave?.(e);
-
-    if (!isElement(e.target)) return;
   });
 
   const dropzones =
@@ -102,7 +104,9 @@ function draggy(options: Options) {
       if (!c) return;
       c.setAttribute("draggable", "true");
       c.classList.add(CLASSNAMES.draggable);
-      c.addEventListener("dragstart", (e) => setup(e as DragEvent, c));
+      c.addEventListener("dragstart", (e) =>
+        setupDragStart(e as DragEvent, c, el),
+      );
     }
 
     el.classList.add(CLASSNAMES.dropzone);
@@ -121,6 +125,7 @@ function draggy(options: Options) {
           el: x,
         });
       });
+      if (!c.length) return;
 
       e.preventDefault();
 
@@ -128,11 +133,11 @@ function draggy(options: Options) {
 
       const x = e.clientX;
       const y = e.clientY;
-      if (!c.length) return;
       if (!dragged) return;
       for (let i = 0; i < c.length; i++) {
         const op = c[i];
-        if (!op) return;
+        if (!op || !isElement(e.target)) return;
+
         if (
           x < op.x + op.width &&
           x > op.x &&
@@ -153,27 +158,23 @@ function draggy(options: Options) {
           return;
         }
 
-        if (!isElement(e.target)) return;
         if (el.contains(dragged)) continue;
-        const valid = isDropzone
-          ? isDropzone(e)
-          : e.target.classList.contains(CLASSNAMES.dropzone);
-        if (valid) {
-          el.append(dragged);
-        }
+        el.append(dragged);
       }
     });
 
     el.addEventListener("drop", (e) => {
       e.preventDefault();
-      if (!isElement(e.target)) return;
+      if (!isElement(e.target) || !dragged || !parent) return;
 
-      const valid = isDropzone
-        ? isDropzone(e)
-        : e.target.classList.contains(CLASSNAMES.dropzone);
-      if (valid && dragged) {
+      const valid =
+        e.target.classList.contains(CLASSNAMES.dropzone) ||
+        e.target.classList.contains(CLASSNAMES.origin);
+      if (valid) {
         onDrop?.(e);
-        dragged.classList.remove(CLASSNAMES.origin);
+      } else {
+        // Return dragged to it's position before dragstart
+        parent.insertBefore(dragged, nextSibling);
       }
     });
   }
