@@ -113,6 +113,7 @@ function draggy(options: Options) {
 
     el.addEventListener("dragover", (e) => {
       if (!(e instanceof DragEvent)) return;
+      if (!dragged) return;
 
       const c: Child[] = [];
       el.querySelectorAll(`.${CLASSNAMES.draggable}`).forEach((x) => {
@@ -133,7 +134,6 @@ function draggy(options: Options) {
 
       const x = e.clientX;
       const y = e.clientY;
-      if (!dragged) return;
       for (let i = 0; i < c.length; i++) {
         const op = c[i];
         if (!op || !isElement(e.target)) return;
