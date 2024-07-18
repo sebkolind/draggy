@@ -140,7 +140,7 @@ function draggy(options: Options) {
     dz.classList.add(CLASSNAMES.dropzone);
 
     dz.addEventListener("dragover", (e) => {
-      if (!(e instanceof DragEvent) || !dragged || !children) return;
+      if (!(e instanceof DragEvent) || !dragged) return;
       const x = e.clientX;
       const y = e.clientY;
 
@@ -172,39 +172,26 @@ function draggy(options: Options) {
         return;
       }
 
-      const c: Child[] = [];
       for (let i = 0; i < children.length; i++) {
-        const x = children[i];
-        if (!x) return;
+        const c = children[i];
+        if (!c) break;
 
-        const rect = x.getBoundingClientRect();
-        c.push({
-          x: rect.x,
-          y: rect.y,
-          height: rect.height,
-          width: rect.width,
-          el: x,
-        });
-      }
-      if (!c.length) return;
-
-      for (let i = 0; i < c.length; i++) {
-        const op = c[i];
-        if (!op) return;
-
+        const rect = c.getBoundingClientRect();
         if (
-          x < op.x + op.width &&
-          x > op.x &&
-          y < op.y + op.height &&
-          y > op.y
+          // horizontal boundaries
+          x > rect.x &&
+          x < rect.x + rect.width &&
+          // vertical boundaries
+          y > rect.y &&
+          y < rect.y + rect.height
         ) {
-          const bottom = y > op.y + op.height / 2;
-          const right = x > op.x + op.width / 2;
+          const bottom = y > rect.y + rect.height / 2;
+          const right = x > rect.x + rect.width / 2;
           const dir = direction === "vertical" ? bottom : right;
-          const where = dir ? op.el : op.el.nextSibling;
+          const where = dir ? c : c.nextSibling;
           if (where === dragged || where === dragged.nextSibling) continue;
           dz.insertBefore(dragged, where);
-          return;
+          break;
         }
 
         // Will append if not close to other draggables
@@ -223,7 +210,7 @@ function draggy(options: Options) {
       e.target.classList.contains(CLASSNAMES.origin) ||
       loose
     ) {
-      onDrop?.(e);
+      onDrop?.(e, dragged);
     } else {
       // Return dragged to it's position before dragstart
       parent.insertBefore(dragged, nextSibling);

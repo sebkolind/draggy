@@ -4,7 +4,7 @@ type Options = {
   onLeave?: (event: Event) => void;
   onEnd?: (event: Event) => void;
   onOver?: (event: Event) => void;
-  onDrop?: (event: Event) => void;
+  onDrop?: (event: Event, dragged: HTMLElement) => void;
   /**
    * Specifies where a draggable can be dropped.
    * - "start": Only allow dropping at the start. With direction=vertical this is the top, and direction=horizontal is to the right.
