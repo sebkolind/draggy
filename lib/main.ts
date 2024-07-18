@@ -15,7 +15,16 @@ function draggy(options: Options) {
   // The shadow element that follows the cursor.
   let shadow: HTMLElement | null = null;
 
-  const { target, onStart, onLeave, onEnd, onOver, onDrop } = options;
+  const {
+    target,
+    onStart,
+    onLeave,
+    onEnd,
+    onOver,
+    onDrop,
+    placement = "any",
+    direction = "vertical",
+  } = options;
 
   const setupDragStart = (e: DragEvent, c: Element, p: Element) => {
     if (e.target !== c) e.preventDefault();
@@ -54,6 +63,13 @@ function draggy(options: Options) {
       // Remove the green plus icon in Chromium browsers.
       e.dataTransfer.dropEffect = "move";
       e.dataTransfer.effectAllowed = "move";
+    }
+
+    for (let i = 0; i < allChildren.length; i++) {
+      const c = allChildren[i];
+      if (!c) return;
+      // Allow dropping on other draggables
+      if (isElement(c) && dragged !== c) c.style.pointerEvents = "none";
     }
 
     const rect = t.getBoundingClientRect();
@@ -127,6 +143,36 @@ function draggy(options: Options) {
 
     dz.addEventListener("dragover", (e) => {
       if (!(e instanceof DragEvent) || !dragged || !children) return;
+      const x = e.clientX;
+      const y = e.clientY;
+
+      e.preventDefault();
+      onOver?.(e);
+
+      if (placement === "start" || placement === "end") {
+        if (placement === "start") {
+          dz.prepend(dragged);
+        } else {
+          dz.append(dragged);
+        }
+
+        return;
+      }
+
+      if (placement === "edges") {
+        const rect = dz.getBoundingClientRect();
+        const bottom = y > rect.y + rect.height / 2;
+        const end = x > rect.x + rect.width / 2;
+        const dir = direction === "vertical" ? bottom : end;
+
+        if (dir) {
+          dz.append(dragged);
+        } else {
+          dz.prepend(dragged);
+        }
+
+        return;
+      }
 
       const c: Child[] = [];
       for (let i = 0; i < children.length; i++) {
@@ -141,19 +187,12 @@ function draggy(options: Options) {
           width: rect.width,
           el: x,
         });
-        // Allow dropping on other draggables
-        if (isElement(x) && dragged !== x) x.style.pointerEvents = "none";
       }
       if (!c.length) return;
 
-      e.preventDefault();
-      onOver?.(e);
-
-      const x = e.clientX;
-      const y = e.clientY;
       for (let i = 0; i < c.length; i++) {
         const op = c[i];
-        if (!op || !isElement(e.target)) return;
+        if (!op) return;
 
         if (
           x < op.x + op.width &&
