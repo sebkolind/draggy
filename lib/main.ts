@@ -86,12 +86,9 @@ function draggy(options: Options) {
   ) => {
     e.preventDefault();
     if (!shadow) return;
-    const x = e.clientX;
-    const y = e.clientY;
-    const scroll = { x: scrollX, y: scrollY };
     shadow.style.opacity = "1";
-    shadow.style.left = `${x - offsets.x + scroll.x}px`;
-    shadow.style.top = `${y - offsets.y + scroll.y}px`;
+    shadow.style.left = `${e.clientX - offsets.x + scrollX}px`;
+    shadow.style.top = `${e.clientY - offsets.y + scrollY}px`;
   };
 
   document.addEventListener("dragend", (e) => {
