@@ -16,7 +16,6 @@ type Options = {
   placement?: "start" | "end" | "edges" | "any";
   /**
    * Specifies the direction in which the end-user drags.
-   * NOTE: This is _not_ a restriction of drag direction. It should be seen as a hint to the calculations internally.
    * - "vertical": Dragging is vertically (up/down)
    * - "horizontal": Dragging is done horizontally (left/right)
    * @default "vertical"

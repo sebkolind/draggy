@@ -163,8 +163,8 @@ function draggy(options: Options) {
       if (placement === "edges") {
         const rect = dz.getBoundingClientRect();
         const bottom = y > rect.y + rect.height / 2;
-        const end = x > rect.x + rect.width / 2;
-        const dir = direction === "vertical" ? bottom : end;
+        const right = x > rect.x + rect.width / 2;
+        const dir = direction === "vertical" ? bottom : right;
 
         if (dir) {
           dz.append(dragged);
@@ -201,15 +201,10 @@ function draggy(options: Options) {
           y < op.y + op.height &&
           y > op.y
         ) {
-          const dir = y < op.y + op.height / 2 || x < op.x + op.width / 2;
+          const bottom = y > op.y + op.height / 2;
+          const right = x > op.x + op.width / 2;
+          const dir = direction === "vertical" ? bottom : right;
           const where = dir ? op.el : op.el.nextSibling;
-          if (
-            dragged === op.el ||
-            (dragged === op.el.nextElementSibling && !dir) ||
-            (dragged === op.el.previousElementSibling && dir)
-          ) {
-            continue;
-          }
           if (where === dragged || where === dragged.nextSibling) continue;
           dz.insertBefore(dragged, where);
           return;
