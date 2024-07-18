@@ -22,6 +22,11 @@ type Options = {
    * @default "vertical"
    */
   direction?: "vertical" | "horizontal";
+  /**
+   * Allow a drop even if the draggable is not directly targeting a dropzone or the placeholder.
+   * @default true
+   */
+  loose?: boolean;
 };
 
 type Child = {

@@ -24,6 +24,7 @@ function draggy(options: Options) {
     onDrop,
     placement = "any",
     direction = "vertical",
+    loose = true,
   } = options;
 
   const setupDragStart = (e: DragEvent, c: Element, p: Element) => {
@@ -227,7 +228,8 @@ function draggy(options: Options) {
 
     if (
       e.target.classList.contains(CLASSNAMES.dropzone) ||
-      e.target.classList.contains(CLASSNAMES.origin)
+      e.target.classList.contains(CLASSNAMES.origin) ||
+      loose
     ) {
       onDrop?.(e);
     } else {
