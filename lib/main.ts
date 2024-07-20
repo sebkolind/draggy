@@ -56,11 +56,12 @@ function draggy(options: Options) {
     // Safari is OK without the custom drag image, but requires an actual image if you do set it.
     if (e.dataTransfer) {
       const fake = document.createElement("img");
+      fake.style.opacity = "0";
       fake.src =
         "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-      fake.style.opacity = "0";
+      e.dataTransfer.clearData();
       // Setting the data to empty string disables some odd drag artifacts in some browsers.
-      e.dataTransfer.setData("text/plain", "");
+      e.dataTransfer.setData("text/html", t.outerHTML);
       e.dataTransfer.setDragImage(fake, 0, 0);
       // Remove the green plus icon in Chromium browsers.
       e.dataTransfer.dropEffect = "move";
