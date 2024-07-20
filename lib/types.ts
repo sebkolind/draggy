@@ -37,12 +37,4 @@ type EventHandler<T> = (
   },
 ) => T;
 
-type Child = {
-  x: number;
-  y: number;
-  height: number;
-  width: number;
-  el: Element;
-};
-
-export { Options, Child };
+export { Options };

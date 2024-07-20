@@ -1,5 +1,5 @@
 import { CLASSNAMES } from "./constants";
-import { Child, Options } from "./types";
+import { Options } from "./types";
 import { isElement } from "./utils";
 
 function draggy(options: Options) {
