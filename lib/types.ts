@@ -27,6 +27,11 @@ type Options = {
    * @default true
    */
   loose?: boolean;
+  /**
+   * Prepare a drop even if draggable isn't close to other draggables
+   * @default true
+   */
+  optimistic?: boolean;
 };
 
 type EventHandler<T> = (

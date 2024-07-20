@@ -26,6 +26,7 @@ function draggy(options: Options) {
     placement = "any",
     direction = "vertical",
     loose = true,
+    optimistic = true,
   } = options;
 
   const setupDragStart = (e: DragEvent, c: Element, p: Element) => {
@@ -197,7 +198,7 @@ function draggy(options: Options) {
         }
 
         // Will append if not close to other draggables
-        if (dz.contains(dragged)) continue;
+        if (dz.contains(dragged) || !optimistic) continue;
         dz.append(dragged);
       }
     });
