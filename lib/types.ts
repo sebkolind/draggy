@@ -37,6 +37,7 @@ type Options = {
 type EventHandler<T> = (
   event: Event,
   context: {
+    // @TODO: Rename this to "origin" or something else.
     dragged: HTMLElement;
     dropzone: HTMLElement | null;
   },

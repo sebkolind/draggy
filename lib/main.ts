@@ -1,120 +1,37 @@
-import { CLASSNAMES } from "./constants";
 import { Options } from "./types";
 import { isElement } from "./utils";
 
-function draggy(options: Options) {
-  // The original parent when starting to drag
-  let parent: Element | null = null;
-  // The next sibling of the dragged element.
-  // Used to put the element back if a drop fails etc.
-  let nextSibling: Element | null = null;
-  // All children of the targets
-  let allChildren: Element[] = [];
-  // The dragged element.
-  let dragged: HTMLElement | null = null;
-  // The shadow element that follows the cursor.
-  let shadow: HTMLElement | null = null;
+type Context = {
+  origin: HTMLElement | null;
+  originZone: HTMLElement | null;
+  nextSibling: HTMLElement | null;
+  zone: HTMLElement | null;
+  zones: HTMLElement[];
+  shadow: HTMLElement | null;
+  children: HTMLElement[];
+  mouseMoveUnsubscribe: (() => void) | null;
+  delay: number;
+  lastMove: number;
+  options: Omit<Options, "target" | "onBeforeDrop" | "onDrop">;
+};
 
-  const {
-    target,
-    onStart,
-    onLeave,
-    onEnd,
-    onOver,
-    onBeforeDrop,
-    onDrop,
-    placement = "any",
-    direction = "vertical",
-    loose = true,
-    optimistic = true,
-  } = options;
-
-  const setupDragStart = (e: DragEvent, c: Element, p: Element) => {
-    if (e.target !== c) e.preventDefault();
-
-    parent = p;
-    nextSibling = c.nextElementSibling;
-
-    onStart?.(e);
-
-    const t = e.target as HTMLElement;
-
-    if (!shadow) {
-      shadow = t.cloneNode(true) as HTMLElement;
-      shadow.classList.add(CLASSNAMES.dragging);
-      shadow.style.position = "absolute";
-      shadow.style.pointerEvents = "none";
-      shadow.style.width = `${t.offsetWidth}px`;
-      shadow.style.height = `${t.offsetHeight}px`;
-      shadow.style.opacity = "0";
-      document.body.append(shadow);
-    }
-
-    dragged = t;
-    dragged.classList.add(CLASSNAMES.origin);
-
-    // Chromium browsers requires setting the drag image.
-    // Safari is OK without the custom drag image, but requires an actual image if you do set it.
-    if (e.dataTransfer) {
-      const fake = document.createElement("img");
-      fake.style.opacity = "0";
-      fake.src =
-        "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==";
-      e.dataTransfer.clearData();
-      // Setting the data to empty string disables some odd drag artifacts in some browsers.
-      e.dataTransfer.setData("text/html", t.outerHTML);
-      e.dataTransfer.setDragImage(fake, 0, 0);
-      // Remove the green plus icon in Chromium browsers.
-      e.dataTransfer.dropEffect = "move";
-      e.dataTransfer.effectAllowed = "move";
-    }
-
-    for (let i = 0; i < allChildren.length; i++) {
-      const c = allChildren[i];
-      if (!c) return;
-      // Allow dropping on other draggables
-      if (isElement(c) && dragged !== c) c.style.pointerEvents = "none";
-    }
-
-    const rect = t.getBoundingClientRect();
-    const offsets = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    document.addEventListener("dragover", (e) =>
-      updateShadowPosition(e, offsets),
-    );
+function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
+  const context: Context = {
+    origin: null,
+    originZone: null,
+    nextSibling: null,
+    zone: null,
+    zones: [],
+    shadow: null,
+    children: [],
+    mouseMoveUnsubscribe: null,
+    delay: 100,
+    lastMove: -1,
+    options: {
+      ...options,
+      optimistic: true,
+    },
   };
-
-  const updateShadowPosition = (
-    e: DragEvent,
-    offsets: { x: number; y: number },
-  ) => {
-    e.preventDefault();
-    if (!shadow) return;
-    shadow.style.opacity = "1";
-    shadow.style.left = `${e.clientX - offsets.x + scrollX}px`;
-    shadow.style.top = `${e.clientY - offsets.y + scrollY}px`;
-  };
-
-  document.addEventListener("dragend", (e) => {
-    onEnd?.(e);
-
-    if (!isElement(e.target)) return;
-    e.target.classList.remove(CLASSNAMES.origin);
-    shadow?.remove();
-    shadow = null;
-    dragged = null;
-
-    for (let i = 0; i < allChildren.length; i++) {
-      const c = allChildren[i];
-      if (c && isElement(c)) {
-        c.style.pointerEvents = "";
-        if (c.style.length === 0) c.removeAttribute("style");
-      }
-    }
-  });
-
-  document.addEventListener("dragleave", (e) => {
-    onLeave?.(e);
-  });
 
   const dropzones =
     typeof target === "string"
@@ -127,115 +44,234 @@ function draggy(options: Options) {
     const dz = dropzones[i];
     if (!dz) return;
 
-    const children = dz.children;
-    for (let i = 0; i < children.length; i++) {
-      const c = children[i];
-      if (!c) return;
+    if (!isElement(dz)) return;
+    context.zones.push(dz);
 
-      allChildren.push(c);
-      c.setAttribute("draggable", "true");
-      c.classList.add(CLASSNAMES.draggable);
-      c.addEventListener("dragstart", (e) =>
-        setupDragStart(e as DragEvent, c, dz),
-      );
+    const ch = dz.children;
+    for (let i = 0; i < ch.length; i++) {
+      const c = ch[i];
+      if (!c || !isElement(c)) return;
+
+      context.children.push(c);
+      setupItem(context, c);
     }
-
-    dz.classList.add(CLASSNAMES.dropzone);
-
-    dz.addEventListener("dragover", (e) => {
-      if (!(e instanceof DragEvent) || !dragged) return;
-      const x = e.clientX;
-      const y = e.clientY;
-
-      e.preventDefault();
-      onOver?.(e);
-
-      if (placement === "start" || placement === "end") {
-        if (placement === "start") {
-          dz.prepend(dragged);
-        } else {
-          dz.append(dragged);
-        }
-
-        return;
-      }
-
-      if (placement === "edges") {
-        const rect = dz.getBoundingClientRect();
-        const bottom = y > rect.y + rect.height / 2;
-        const right = x > rect.x + rect.width / 2;
-        const dir = direction === "vertical" ? bottom : right;
-
-        if (dir) {
-          dz.append(dragged);
-        } else {
-          dz.prepend(dragged);
-        }
-
-        return;
-      }
-
-      for (let i = 0; i < children.length; i++) {
-        const c = children[i];
-        if (!c) break;
-
-        const rect = c.getBoundingClientRect();
-        if (
-          // horizontal boundaries
-          x > rect.x &&
-          x < rect.x + rect.width &&
-          // vertical boundaries
-          y > rect.y &&
-          y < rect.y + rect.height
-        ) {
-          const bottom = y > rect.y + rect.height / 2;
-          const right = x > rect.x + rect.width / 2;
-          const dir = direction === "vertical" ? bottom : right;
-          const where = dir ? c : c.nextSibling;
-          if (where === dragged || where === dragged.nextSibling) continue;
-          dz.insertBefore(dragged, where);
-          break;
-        }
-
-        // Will append if not close to other draggables
-        if (dz.contains(dragged) || !optimistic) continue;
-        dz.append(dragged);
-      }
-    });
   }
 
-  document.addEventListener("drop", (e) => {
-    e.preventDefault();
-    if (!isElement(e.target) || !dragged || !parent) return;
+  document.addEventListener("mouseup", (ev) => {
+    ev.preventDefault();
 
-    const dropzone = dragged.parentElement;
-
-    // Return to position before dragstart
-    const returnToStart = () =>
-      parent && dragged && parent.insertBefore(dragged, nextSibling);
-
-    if (onBeforeDrop) {
-      const bool = onBeforeDrop(e, {
-        dragged,
-        dropzone,
+    if (onBeforeDrop && context.originZone && context.origin) {
+      const bool = onBeforeDrop(ev, {
+        dragged: context.origin,
+        dropzone: context.zone,
       });
 
       if (!bool) {
-        returnToStart();
-        return;
+        context.originZone.insertBefore(context.origin, context.nextSibling);
       }
     }
 
-    if (
-      e.target.classList.contains(CLASSNAMES.dropzone) ||
-      e.target.classList.contains(CLASSNAMES.origin) ||
-      loose
-    ) {
-      onDrop?.(e, { dragged, dropzone });
-    } else {
-      returnToStart();
+    if (onDrop && context.origin) {
+      onDrop(ev, { dragged: context.origin, dropzone: context.zone });
     }
+
+    context.shadow?.remove();
+    context.shadow = null;
+
+    context.origin?.classList.remove("placeholder");
+    context.origin = null;
+
+    context.mouseMoveUnsubscribe?.();
+
+    handleChildren(context);
   });
 }
+
+const setupItem = (context: Context, el: HTMLElement) => {
+  el.addEventListener("mousedown", (ev) => {
+    ev.preventDefault();
+
+    handleMouseDown(context, ev, el);
+  });
+};
+
+const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
+  context.shadow = createShadow(context, el, ev.clientX, ev.clientY);
+
+  el.classList.add("placeholder");
+  context.origin = el;
+
+  context.originZone = el.parentElement;
+  context.nextSibling = el.nextElementSibling as HTMLElement | null;
+
+  handleChildren(context);
+};
+
+const createShadow = (
+  context: Context,
+  el: HTMLElement,
+  clientX: number,
+  clientY: number,
+) => {
+  const shadow = el.cloneNode(true) as HTMLElement;
+
+  shadow.classList.add("dragging");
+  shadow.style.position = "absolute";
+  shadow.style.pointerEvents = "none";
+  shadow.style.width = `${el.offsetWidth}px`;
+  shadow.style.height = `${el.offsetHeight}px`;
+  shadow.style.zIndex = "9999";
+
+  const rect = el.getBoundingClientRect();
+  const offsets = { x: clientX - rect.left, y: clientY - rect.top };
+
+  shadow.style.left = `${clientX - offsets.x + scrollX}px`;
+  shadow.style.top = `${clientY - offsets.y + scrollY}px`;
+
+  const onMouseMove = (ev: Event) => handleMouseMove(ev, offsets);
+  document.addEventListener("mousemove", onMouseMove);
+
+  const handleMouseMove = (ev: Event, offsets: { x: number; y: number }) => {
+    const e = ev as MouseEvent;
+    e.preventDefault();
+
+    const x = e.clientX;
+    const y = e.clientY;
+
+    // Make shadow follow the cursor
+    shadow.style.left = `${x - offsets.x + scrollX}px`;
+    shadow.style.top = `${y - offsets.y + scrollY}px`;
+
+    // Check if the cursor is above a dropzone
+    const hovered = document.elementFromPoint(x, y);
+    const zones = context.zones;
+
+    if (hovered && zones.length) {
+      for (let i = 0; i < zones.length; i++) {
+        const z = zones[i];
+        if (!z) break;
+        if (z.contains(hovered)) {
+          if (context.zone !== z) context.zone = z;
+          handlePushing(context, x, y, "vertical");
+          break;
+        }
+      }
+    }
+  };
+
+  context.mouseMoveUnsubscribe = () =>
+    document.removeEventListener("mousemove", onMouseMove);
+
+  document.body.append(shadow);
+
+  return shadow;
+};
+
+const handlePushing = (
+  context: Context,
+  x: number,
+  y: number,
+  direction = "vertical",
+) => {
+  if (!context.zone || !context.origin) {
+    console.error("Error: Zone or origin is null. Cannot handle pushing.");
+    return;
+  }
+
+  const currentTime = Date.now();
+  const { lastMove, delay } = context;
+
+  if (currentTime - lastMove < delay) return;
+
+  const placeholder = context.origin;
+  const z = context.zone;
+  if (!placeholder || !z) {
+    console.error(
+      "Error: placeholder or zone is null. Cannot handle pushing.",
+      context,
+    );
+    return;
+  }
+
+  const placement = context.options.placement;
+  if (placement === "start" || placement === "end") {
+    if (placement === "start") {
+      context.zone.prepend(context.origin);
+    } else {
+      context.zone.append(context.origin);
+    }
+
+    return;
+  }
+
+  if (placement === "edges") {
+    const rect = context.zone.getBoundingClientRect();
+    const bottom = y > rect.y + rect.height / 2;
+    const right = x > rect.x + rect.width / 2;
+    const dir = direction === "vertical" ? bottom : right;
+
+    if (dir) {
+      context.zone.append(context.origin);
+    } else {
+      context.zone.prepend(context.origin);
+    }
+
+    return;
+  }
+
+  const children = Array.from(z.children).filter(
+    (c) => c !== placeholder && !c.classList.contains("placeholder"),
+  );
+  const zones = children.map((c) => c.getBoundingClientRect());
+
+  for (let i = 0; i < zones.length; i++) {
+    const rect = zones[i];
+    if (!rect) continue;
+    const c = children[i];
+    if (!c) continue;
+
+    if (x > rect.left && x < rect.right && y > rect.top && y < rect.bottom) {
+      const isBottomHalf = y > rect.top + rect.height / 2;
+      const isRightHalf = x > rect.left + rect.width / 2;
+
+      let targetNode: ChildNode | null = null;
+      if (direction === "vertical") {
+        targetNode = isBottomHalf ? c.nextSibling : c;
+      } else {
+        targetNode = isRightHalf ? c.nextSibling : c;
+      }
+
+      if (
+        targetNode === placeholder ||
+        targetNode === placeholder.nextSibling
+      ) {
+        continue;
+      }
+
+      z.insertBefore(placeholder, targetNode);
+
+      context.lastMove = currentTime;
+      break;
+    }
+
+    if (context.options.optimistic && !context.zone.contains(context.origin)) {
+      context.zone.append(context.origin);
+    }
+  }
+};
+
+const handleChildren = (context: Context) => {
+  const revert = context.shadow == null;
+  for (let i = 0; i < context.children.length; i++) {
+    const c = context.children[i];
+    if (!c) return;
+    if (revert) {
+      c.style.pointerEvents = "";
+      if (!c.style.length) c.removeAttribute("style");
+    } else {
+      c.style.pointerEvents = "none";
+    }
+  }
+};
 
 export { draggy };
