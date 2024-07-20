@@ -21,6 +21,7 @@ function draggy(options: Options) {
     onLeave,
     onEnd,
     onOver,
+    onBeforeDrop,
     onDrop,
     placement = "any",
     direction = "vertical",
@@ -205,15 +206,32 @@ function draggy(options: Options) {
     e.preventDefault();
     if (!isElement(e.target) || !dragged || !parent) return;
 
+    const dropzone = dragged.parentElement;
+
+    // Return to position before dragstart
+    const returnToStart = () =>
+      parent && dragged && parent.insertBefore(dragged, nextSibling);
+
+    if (onBeforeDrop) {
+      const bool = onBeforeDrop(e, {
+        dragged,
+        dropzone,
+      });
+
+      if (!bool) {
+        returnToStart();
+        return;
+      }
+    }
+
     if (
       e.target.classList.contains(CLASSNAMES.dropzone) ||
       e.target.classList.contains(CLASSNAMES.origin) ||
       loose
     ) {
-      onDrop?.(e, dragged);
+      onDrop?.(e, { dragged, dropzone });
     } else {
-      // Return dragged to it's position before dragstart
-      parent.insertBefore(dragged, nextSibling);
+      returnToStart();
     }
   });
 }

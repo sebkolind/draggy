@@ -4,7 +4,8 @@ type Options = {
   onLeave?: (event: Event) => void;
   onEnd?: (event: Event) => void;
   onOver?: (event: Event) => void;
-  onDrop?: (event: Event, dragged: HTMLElement) => void;
+  onBeforeDrop?: EventHandler<boolean>;
+  onDrop?: EventHandler<void>;
   /**
    * Specifies where a draggable can be dropped.
    * - "start": Only allow dropping at the start. With direction=vertical this is the top, and direction=horizontal is to the right.
@@ -27,6 +28,14 @@ type Options = {
    */
   loose?: boolean;
 };
+
+type EventHandler<T> = (
+  event: Event,
+  context: {
+    dragged: HTMLElement;
+    dropzone: HTMLElement | null;
+  },
+) => T;
 
 type Child = {
   x: number;
