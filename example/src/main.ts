@@ -2,6 +2,7 @@ import { draggy } from "@sebkolind/draggy";
 
 draggy({
   target: ".column",
+  optimistic: false,
   onDrop(_, { dragged, dropzone }) {
     const status = dropzone?.dataset.status;
     const el = dragged.querySelector(".status");
