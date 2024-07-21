@@ -30,10 +30,10 @@ function draggy({ target, ...options }: Options) {
     delay: 100,
     lastMove: -1,
     options: {
-      ...options,
       optimistic: true,
       direction: "vertical",
       placement: "any",
+      ...options,
     },
   };
 
