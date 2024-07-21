@@ -163,14 +163,11 @@ const createShadow = (
     const x = e.clientX;
     const y = e.clientY;
 
-    // Make shadow follow the cursor
     shadow.style.left = `${x - offsets.x + scrollX}px`;
     shadow.style.top = `${y - offsets.y + scrollY}px`;
 
-    // Check if the cursor is above a dropzone
     const hovered = document.elementFromPoint(x, y);
     const zones = context.zones;
-
     if (hovered && zones.length) {
       for (let i = 0; i < zones.length; i++) {
         const z = zones[i];

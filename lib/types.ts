@@ -2,7 +2,6 @@ type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
   onStart?: EventHandler<void>;
   onLeave?: EventHandler<void>;
-  onEnd?: EventHandler<void>;
   onOver?: EventHandler<void>;
   onBeforeDrop?: EventHandler<boolean>;
   onDrop?: EventHandler<void>;
