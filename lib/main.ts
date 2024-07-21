@@ -166,23 +166,49 @@ const createShadow = (
     shadow.style.left = `${x - offsets.x + scrollX}px`;
     shadow.style.top = `${y - offsets.y + scrollY}px`;
 
-    const hovered = document.elementFromPoint(x, y);
+    const point = document.elementFromPoint(x, y);
+    if (!point) {
+      console.error("Error: No element found at the current mouse position.");
+      return;
+    }
+
+    if (context.zone && !context.zone.contains(point)) {
+      if (context.options.onLeave && context.origin) {
+        context.options.onLeave(ev, {
+          dragged: context.origin,
+          dropzone: context.zone,
+        });
+      }
+      context.zone = null;
+    }
+
     const zones = context.zones;
-    if (hovered && zones.length) {
-      for (let i = 0; i < zones.length; i++) {
-        const z = zones[i];
-        if (!z) break;
-        if (z.contains(hovered)) {
-          if (context.zone !== z) context.zone = z;
-          if (context.options.onOver && context.origin) {
-            context.options.onOver(ev, {
+    if (!zones.length) {
+      console.error("Error: No valid drop zones available.");
+      return;
+    }
+
+    for (let i = 0; i < zones.length; i++) {
+      const z = zones[i];
+      if (!z) break;
+      if (z.contains(point)) {
+        if (context.zone !== z) {
+          context.zone = z;
+          if (context.options.onEnter && context.origin) {
+            context.options.onEnter(ev, {
               dragged: context.origin,
               dropzone: context.zone,
             });
           }
-          handlePushing(context, x, y);
-          break;
         }
+        if (context.options.onOver && context.origin) {
+          context.options.onOver(ev, {
+            dragged: context.origin,
+            dropzone: context.zone,
+          });
+        }
+        handlePushing(context, x, y);
+        break;
       }
     }
   };
