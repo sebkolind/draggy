@@ -9,7 +9,7 @@ type Context = {
   zones: HTMLElement[];
   shadow: HTMLElement | null;
   children: HTMLElement[];
-  mouseMoveUnsubscribe: (() => void) | null;
+  onMouseMoveUnsubscribe: (() => void) | null;
   delay: number;
   lastMove: number;
   options: Omit<Options, "target" | "onBeforeDrop" | "onDrop">;
@@ -24,7 +24,7 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
     zones: [],
     shadow: null,
     children: [],
-    mouseMoveUnsubscribe: null,
+    onMouseMoveUnsubscribe: null,
     delay: 100,
     lastMove: -1,
     options: {
@@ -42,22 +42,22 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
 
   for (let i = 0; i < dropzones.length; i++) {
     const dz = dropzones[i];
-    if (!dz) return;
+    if (!dz) break;
 
-    if (!isElement(dz)) return;
+    if (!isElement(dz)) break;
     context.zones.push(dz);
 
     const ch = dz.children;
     for (let i = 0; i < ch.length; i++) {
       const c = ch[i];
-      if (!c || !isElement(c)) return;
+      if (!c || !isElement(c)) break;
 
       context.children.push(c);
       setupItem(context, c);
     }
   }
 
-  document.addEventListener("mouseup", (ev) => {
+  const onMouseUp = (ev: MouseEvent) => {
     ev.preventDefault();
 
     if (onBeforeDrop && context.originZone && context.origin) {
@@ -81,10 +81,17 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
     context.origin?.classList.remove("placeholder");
     context.origin = null;
 
-    context.mouseMoveUnsubscribe?.();
+    context.onMouseMoveUnsubscribe?.();
 
     handleChildren(context);
-  });
+  };
+  document.addEventListener("mouseup", onMouseUp);
+
+  return {
+    destroy: () => {
+      document.removeEventListener("mouseup", onMouseUp);
+    },
+  };
 }
 
 const setupItem = (context: Context, el: HTMLElement) => {
@@ -159,7 +166,7 @@ const createShadow = (
     }
   };
 
-  context.mouseMoveUnsubscribe = () =>
+  context.onMouseMoveUnsubscribe = () =>
     document.removeEventListener("mousemove", onMouseMove);
 
   document.body.append(shadow);
