@@ -1,9 +1,9 @@
 type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
-  onStart?: (event: Event) => void;
-  onLeave?: (event: Event) => void;
-  onEnd?: (event: Event) => void;
-  onOver?: (event: Event) => void;
+  onStart?: EventHandler<void>;
+  onLeave?: EventHandler<void>;
+  onEnd?: EventHandler<void>;
+  onOver?: EventHandler<void>;
   onBeforeDrop?: EventHandler<boolean>;
   onDrop?: EventHandler<void>;
   /**

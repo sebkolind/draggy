@@ -9,13 +9,14 @@ type Context = {
   zones: HTMLElement[];
   shadow: HTMLElement | null;
   children: HTMLElement[];
-  onMouseMoveUnsubscribe: (() => void) | null;
+  events: Map<HTMLElement, (ev: MouseEvent) => void>;
+  removeMouseMove: (() => void) | null;
   delay: number;
   lastMove: number;
-  options: Omit<Options, "target" | "onBeforeDrop" | "onDrop">;
+  options: Omit<Options, "target">;
 };
 
-function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
+function draggy({ target, ...options }: Options) {
   const context: Context = {
     origin: null,
     originZone: null,
@@ -24,7 +25,8 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
     zones: [],
     shadow: null,
     children: [],
-    onMouseMoveUnsubscribe: null,
+    events: new Map(),
+    removeMouseMove: null,
     delay: 100,
     lastMove: -1,
     options: {
@@ -33,35 +35,47 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
     },
   };
 
-  const dropzones =
+  const zones =
     typeof target === "string"
       ? document.querySelectorAll(target)
       : target instanceof NodeList || Array.isArray(target)
         ? target
         : [target];
 
-  for (let i = 0; i < dropzones.length; i++) {
-    const dz = dropzones[i];
-    if (!dz) break;
+  for (let i = 0; i < zones.length; i++) {
+    const z = zones[i];
+    if (!z) break;
 
-    if (!isElement(dz)) break;
-    context.zones.push(dz);
+    if (!isElement(z)) break;
+    context.zones.push(z);
 
-    const ch = dz.children;
+    const ch = z.children;
     for (let i = 0; i < ch.length; i++) {
       const c = ch[i];
       if (!c || !isElement(c)) break;
 
       context.children.push(c);
-      setupItem(context, c);
+
+      const onMouseDown = (ev: MouseEvent) => {
+        ev.preventDefault();
+        handleMouseDown(context, ev, c);
+        if (context.options.onStart && context.origin) {
+          context.options.onStart(ev, {
+            dragged: context.origin,
+            dropzone: context.zone,
+          });
+        }
+      };
+      c.addEventListener("mousedown", onMouseDown);
+      context.events.set(c, onMouseDown);
     }
   }
 
   const onMouseUp = (ev: MouseEvent) => {
     ev.preventDefault();
 
-    if (onBeforeDrop && context.originZone && context.origin) {
-      const bool = onBeforeDrop(ev, {
+    if (context.options.onBeforeDrop && context.originZone && context.origin) {
+      const bool = context.options.onBeforeDrop(ev, {
         dragged: context.origin,
         dropzone: context.zone,
       });
@@ -71,8 +85,11 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
       }
     }
 
-    if (onDrop && context.origin) {
-      onDrop(ev, { dragged: context.origin, dropzone: context.zone });
+    if (context.options.onDrop && context.origin) {
+      context.options.onDrop(ev, {
+        dragged: context.origin,
+        dropzone: context.zone,
+      });
     }
 
     context.shadow?.remove();
@@ -81,7 +98,7 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
     context.origin?.classList.remove("placeholder");
     context.origin = null;
 
-    context.onMouseMoveUnsubscribe?.();
+    context.removeMouseMove?.();
 
     handleChildren(context);
   };
@@ -90,17 +107,16 @@ function draggy({ target, onBeforeDrop, onDrop, ...options }: Options) {
   return {
     destroy: () => {
       document.removeEventListener("mouseup", onMouseUp);
+      for (const [el, handler] of context.events) {
+        if (document.body.contains(el)) {
+          el.removeEventListener("mousedown", handler);
+        } else {
+          context.events.delete(el);
+        }
+      }
     },
   };
 }
-
-const setupItem = (context: Context, el: HTMLElement) => {
-  el.addEventListener("mousedown", (ev) => {
-    ev.preventDefault();
-
-    handleMouseDown(context, ev, el);
-  });
-};
 
 const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   context.shadow = createShadow(context, el, ev.clientX, ev.clientY);
@@ -159,6 +175,12 @@ const createShadow = (
         if (!z) break;
         if (z.contains(hovered)) {
           if (context.zone !== z) context.zone = z;
+          if (context.options.onOver && context.origin) {
+            context.options.onOver(ev, {
+              dragged: context.origin,
+              dropzone: context.zone,
+            });
+          }
           handlePushing(context, x, y, "vertical");
           break;
         }
@@ -166,7 +188,7 @@ const createShadow = (
     }
   };
 
-  context.onMouseMoveUnsubscribe = () =>
+  context.removeMouseMove = () =>
     document.removeEventListener("mousemove", onMouseMove);
 
   document.body.append(shadow);
