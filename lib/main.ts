@@ -32,6 +32,8 @@ function draggy({ target, ...options }: Options) {
     options: {
       ...options,
       optimistic: true,
+      direction: "vertical",
+      placement: "any",
     },
   };
 
@@ -181,7 +183,7 @@ const createShadow = (
               dropzone: context.zone,
             });
           }
-          handlePushing(context, x, y, "vertical");
+          handlePushing(context, x, y);
           break;
         }
       }
@@ -196,12 +198,7 @@ const createShadow = (
   return shadow;
 };
 
-const handlePushing = (
-  context: Context,
-  x: number,
-  y: number,
-  direction = "vertical",
-) => {
+const handlePushing = (context: Context, x: number, y: number) => {
   if (!context.zone || !context.origin) {
     console.error("Error: Zone or origin is null. Cannot handle pushing.");
     return;
@@ -237,7 +234,7 @@ const handlePushing = (
     const rect = context.zone.getBoundingClientRect();
     const bottom = y > rect.y + rect.height / 2;
     const right = x > rect.x + rect.width / 2;
-    const dir = direction === "vertical" ? bottom : right;
+    const dir = context.options.direction === "vertical" ? bottom : right;
 
     if (dir) {
       context.zone.append(context.origin);
@@ -264,7 +261,7 @@ const handlePushing = (
       const isRightHalf = x > rect.left + rect.width / 2;
 
       let targetNode: ChildNode | null = null;
-      if (direction === "vertical") {
+      if (context.options.direction === "vertical") {
         targetNode = isBottomHalf ? c.nextSibling : c;
       } else {
         targetNode = isRightHalf ? c.nextSibling : c;
