@@ -17,8 +17,8 @@ test("can drag&drop cards", async ({ page }) => {
 
   const column = page.locator(".column").first();
   const [card1, card2] = await column.evaluate((div) => [
-    div.children[0].textContent,
-    div.children[1].textContent,
+    div.children[0]!.textContent,
+    div.children[1]!.textContent,
   ]);
 
   expect(card1?.includes("Announce the v0.0.1 release")).toBe(true);
