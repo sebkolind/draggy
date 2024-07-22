@@ -85,6 +85,8 @@ describe("draggy", () => {
     expect(onDrop).toHaveBeenCalledTimes(1);
   });
 
+  // @TODO: This is a bit weak.
+  // The test should be a bit more in-depth with removing context.events + event on each draggable.
   test("that destroy removes the mouseup event", () => {
     jest.spyOn(document, "addEventListener").mockImplementation(jest.fn());
     jest.spyOn(document, "removeEventListener").mockImplementation(jest.fn());
