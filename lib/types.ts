@@ -1,3 +1,18 @@
+type Context = {
+  origin: HTMLElement | null;
+  originZone: HTMLElement | null;
+  nextSibling: HTMLElement | null;
+  zone: HTMLElement | null;
+  zones: HTMLElement[];
+  shadow: HTMLElement | null;
+  children: HTMLElement[];
+  events: Map<HTMLElement, (ev: MouseEvent) => void>;
+  removeMouseMove: (() => void) | null;
+  delay: number;
+  lastMove: number;
+  options: Omit<Options, "target">;
+};
+
 type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
   onStart?: EventHandler<void>;
@@ -43,4 +58,4 @@ type EventHandler<T> = (
   },
 ) => T;
 
-export { Options };
+export { Context, Options };

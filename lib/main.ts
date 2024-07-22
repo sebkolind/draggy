@@ -1,20 +1,5 @@
-import { Options } from "./types";
+import { Options, Context } from "./types";
 import { isElement } from "./utils";
-
-type Context = {
-  origin: HTMLElement | null;
-  originZone: HTMLElement | null;
-  nextSibling: HTMLElement | null;
-  zone: HTMLElement | null;
-  zones: HTMLElement[];
-  shadow: HTMLElement | null;
-  children: HTMLElement[];
-  events: Map<HTMLElement, (ev: MouseEvent) => void>;
-  removeMouseMove: (() => void) | null;
-  delay: number;
-  lastMove: number;
-  options: Omit<Options, "target">;
-};
 
 function draggy({ target, ...options }: Options) {
   const context: Context = {
