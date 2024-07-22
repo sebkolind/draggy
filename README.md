@@ -33,10 +33,11 @@ type Options = {
   /**
    * Events
    */
-  onStart?: (event: Event) => void;
-  onLeave?: (event: Event) => void;
-  onOver?: (event: Event) => void;
-  onDrop?: (event: Event, dragged: HTMLElement) => void;
+  onStart?: EventHandler<void>;
+  onLeave?: EventHandler<void>;
+  onOver?: EventHandler<void>;
+  onBeforeDrop?: EventHandler<boolean>;
+  onDrop?: EventHandler<void>;
 
   /**
    * Specifies where a draggable can be dropped.
