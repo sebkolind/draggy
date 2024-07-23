@@ -321,6 +321,7 @@ const handlePushing = (context: Context, x: number, y: number) => {
 
     if (context.options.optimistic && !context.zone.contains(context.origin)) {
       context.zone.append(context.origin);
+      context.lastMove = currentTime;
     }
   }
 };
