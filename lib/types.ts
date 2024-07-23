@@ -10,17 +10,25 @@ type Context = {
   removeMouseMove: (() => void) | null;
   delay: number;
   lastMove: number;
+  multiple: Draggable[];
   options: Omit<Options, "target">;
+};
+
+type Draggable = Pick<Context, "origin" | "originZone" | "nextSibling"> & {
+  style: {
+    display: string;
+  };
 };
 
 type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
-  onStart?: EventHandler<void>;
-  onLeave?: EventHandler<void>;
-  onEnter?: EventHandler<void>;
-  onOver?: EventHandler<void>;
+  onStart?: EventHandler;
+  onLeave?: EventHandler;
+  onEnter?: EventHandler;
+  onOver?: EventHandler;
   onBeforeDrop?: EventHandler<boolean>;
-  onDrop?: EventHandler<void>;
+  onDrop?: EventHandler;
+  onShadow?: EventHandler;
   /**
    * Specifies where a draggable can be dropped.
    * - "start": Only allow dropping at the start. With direction=vertical this is the top, and direction=horizontal is to the right.
@@ -49,13 +57,10 @@ type Options = {
   optimistic?: boolean;
 };
 
-type EventHandler<T> = (
+type EventHandler<T = void> = (
   event: Event,
-  context: {
-    // @TODO: Rename this to "origin" or something else.
-    dragged: HTMLElement;
-    dropzone: HTMLElement | null;
-  },
+  context: Pick<Context, "origin" | "zone"> &
+    Partial<Pick<Context, "shadow" | "multiple">>,
 ) => T;
 
 export { Context, Options };

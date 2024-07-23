@@ -1,3 +1,4 @@
+import { CLASSNAMES } from "./constants";
 import { Options, Context } from "./types";
 import { isElement } from "./utils";
 
@@ -14,6 +15,7 @@ function draggy({ target, ...options }: Options) {
     removeMouseMove: null,
     delay: 100,
     lastMove: -1,
+    multiple: [],
     options: {
       optimistic: true,
       direction: "vertical",
@@ -46,12 +48,10 @@ function draggy({ target, ...options }: Options) {
       const onMouseDown = (ev: MouseEvent) => {
         ev.preventDefault();
         handleMouseDown(context, ev, c);
-        if (context.options.onStart && context.origin) {
-          context.options.onStart(ev, {
-            dragged: context.origin,
-            dropzone: context.zone,
-          });
-        }
+        context.options.onStart?.(ev, {
+          origin: context.origin,
+          zone: context.zone,
+        });
       };
       c.addEventListener("mousedown", onMouseDown);
       context.events.set(c, onMouseDown);
@@ -63,8 +63,8 @@ function draggy({ target, ...options }: Options) {
 
     if (context.options.onBeforeDrop && context.originZone && context.origin) {
       const bool = context.options.onBeforeDrop(ev, {
-        dragged: context.origin,
-        dropzone: context.zone,
+        origin: context.origin,
+        zone: context.zone,
       });
 
       if (!bool) {
@@ -72,17 +72,27 @@ function draggy({ target, ...options }: Options) {
       }
     }
 
-    if (context.options.onDrop && context.origin) {
-      context.options.onDrop(ev, {
-        dragged: context.origin,
-        dropzone: context.zone,
-      });
-    }
+    context.options.onDrop?.(ev, {
+      origin: context.origin,
+      zone: context.zone,
+    });
 
     context.shadow?.remove();
     context.shadow = null;
 
-    context.origin?.classList.remove("placeholder");
+    if (context.multiple && context.zone && context.origin) {
+      for (let i = 0; i < context.multiple.length; i++) {
+        const m = context.multiple[i];
+        if (!m || !m.origin) return;
+        context.zone.insertBefore(m.origin, context.origin.nextElementSibling);
+        m.origin.style.display = m.style.display;
+        m.origin.classList.remove(CLASSNAMES.selection);
+      }
+
+      context.multiple = [];
+    }
+
+    context.origin?.classList.remove(CLASSNAMES.origin);
     context.origin = null;
 
     context.removeMouseMove?.();
@@ -106,10 +116,35 @@ function draggy({ target, ...options }: Options) {
 }
 
 const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
-  context.shadow = createShadow(context, el, ev.clientX, ev.clientY);
+  if (ev.shiftKey) {
+    context.multiple.push({
+      origin: el,
+      style: {
+        display: el.style.display,
+      },
+      originZone: el.parentElement,
+      nextSibling: el.nextElementSibling as HTMLElement | null,
+    });
 
-  el.classList.add("placeholder");
+    el.classList.add(CLASSNAMES.selection);
+
+    return;
+  }
+
+  context.shadow = createShadow(context, ev, el);
+
+  el.classList.add(CLASSNAMES.origin);
   context.origin = el;
+
+  if (context.multiple.length) {
+    for (let i = 0; i < context.multiple.length; i++) {
+      const m = context.multiple[i];
+      if (!m?.origin) return;
+      if (m.origin !== context.origin) {
+        m.origin.style.display = "none";
+      }
+    }
+  }
 
   context.originZone = el.parentElement;
   context.nextSibling = el.nextElementSibling as HTMLElement | null;
@@ -117,15 +152,10 @@ const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   handleChildren(context);
 };
 
-const createShadow = (
-  context: Context,
-  el: HTMLElement,
-  clientX: number,
-  clientY: number,
-) => {
+const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   const shadow = el.cloneNode(true) as HTMLElement;
 
-  shadow.classList.add("dragging");
+  shadow.classList.add(CLASSNAMES.dragging);
   shadow.style.position = "absolute";
   shadow.style.pointerEvents = "none";
   shadow.style.width = `${el.offsetWidth}px`;
@@ -133,10 +163,17 @@ const createShadow = (
   shadow.style.zIndex = "9999";
 
   const rect = el.getBoundingClientRect();
-  const offsets = { x: clientX - rect.left, y: clientY - rect.top };
+  const offsets = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
 
-  shadow.style.left = `${clientX - offsets.x + scrollX}px`;
-  shadow.style.top = `${clientY - offsets.y + scrollY}px`;
+  shadow.style.left = `${ev.clientX - offsets.x + scrollX}px`;
+  shadow.style.top = `${ev.clientY - offsets.y + scrollY}px`;
+
+  context.options.onShadow?.(ev, {
+    shadow,
+    origin: el,
+    zone: context.zone,
+    multiple: context.multiple,
+  });
 
   const onMouseMove = (ev: Event) => handleMouseMove(ev, offsets);
   document.addEventListener("mousemove", onMouseMove);
@@ -158,12 +195,10 @@ const createShadow = (
     }
 
     if (context.zone && !context.zone.contains(point)) {
-      if (context.options.onLeave && context.origin) {
-        context.options.onLeave(ev, {
-          dragged: context.origin,
-          dropzone: context.zone,
-        });
-      }
+      context.options.onLeave?.(ev, {
+        origin: context.origin,
+        zone: context.zone,
+      });
       context.zone = null;
     }
 
@@ -179,19 +214,15 @@ const createShadow = (
       if (z.contains(point)) {
         if (context.zone !== z) {
           context.zone = z;
-          if (context.options.onEnter && context.origin) {
-            context.options.onEnter(ev, {
-              dragged: context.origin,
-              dropzone: context.zone,
-            });
-          }
-        }
-        if (context.options.onOver && context.origin) {
-          context.options.onOver(ev, {
-            dragged: context.origin,
-            dropzone: context.zone,
+          context.options.onEnter?.(ev, {
+            origin: context.origin,
+            zone: context.zone,
           });
         }
+        context.options.onOver?.(ev, {
+          origin: context.origin,
+          zone: context.zone,
+        });
         handlePushing(context, x, y);
         break;
       }
@@ -254,7 +285,7 @@ const handlePushing = (context: Context, x: number, y: number) => {
   }
 
   const children = Array.from(z.children).filter(
-    (c) => c !== placeholder && !c.classList.contains("placeholder"),
+    (c) => c !== placeholder && !c.classList.contains(CLASSNAMES.origin),
   );
   const zones = children.map((c) => c.getBoundingClientRect());
 

@@ -33,11 +33,12 @@ type Options = {
   /**
    * Events
    */
-  onStart?: EventHandler<void>;
-  onLeave?: EventHandler<void>;
-  onOver?: EventHandler<void>;
+  onStart?: EventHandler;
+  onLeave?: EventHandler;
+  onOver?: EventHandler;
   onBeforeDrop?: EventHandler<boolean>;
-  onDrop?: EventHandler<void>;
+  onDrop?: EventHandler;
+  onShadow?: EventHandler;
 
   /**
    * Specifies where a draggable can be dropped.
