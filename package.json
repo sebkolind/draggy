@@ -11,7 +11,6 @@
   "scripts": {
     "build": "rm -rf .parcel-cache dist && parcel build",
     "dev": "parcel watch lib/main.ts --no-cache",
-    "example": "parcel watch index.html",
     "test": "jest"
   },
   "author": "sebkolind <sks1993@gmail.com>",

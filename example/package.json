@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "source": "src/index.html",
   "scripts": {
-    "dev": "parcel src/index.html --no-cache --port 4321"
+    "dev": "parcel src/index.html --no-cache --port 4321",
+    "build": "rm -rf .parcel-cache dist && parcel build"
   },
   "author": "",
   "license": "MIT",
