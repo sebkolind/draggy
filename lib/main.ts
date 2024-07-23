@@ -258,6 +258,12 @@ const handlePushing = (context: Context, x: number, y: number) => {
     return;
   }
 
+  if (!z.children.length) {
+    z.append(context.origin);
+    context.lastMove = currentTime;
+    return;
+  }
+
   const placement = context.options.placement;
   if (placement === "start" || placement === "end") {
     if (placement === "start") {
