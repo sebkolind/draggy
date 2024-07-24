@@ -3,6 +3,9 @@ import { draggy } from "@sebkolind/draggy";
 draggy({
   target: ".column",
   placement: "any",
+  selection: {
+    enabled: true,
+  },
   onStart(_, { shadow, multiple }) {
     if (!multiple?.length) return;
 
