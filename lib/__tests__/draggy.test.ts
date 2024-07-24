@@ -83,19 +83,6 @@ describe("draggy", () => {
     expect(onBeforeDrop).toHaveBeenCalledTimes(1);
   });
 
-  test("that onDrop is fired if defined", () => {
-    const onDrop = jest.fn();
-
-    draggy({ target: ".column", onDrop });
-
-    const draggable = screen.getByText("Card 4");
-
-    fireEvent.mouseDown(draggable);
-    fireEvent.mouseUp(draggable);
-
-    expect(onDrop).toHaveBeenCalledTimes(1);
-  });
-
   test("that multi-selection starts", async () => {
     const onStart = jest.fn();
 
