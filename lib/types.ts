@@ -78,6 +78,18 @@ type Options = {
    * @default true
    */
   optimistic?: boolean;
+  selection?: {
+    /**
+     * Enable selection
+     * @default false
+     */
+    enabled: boolean;
+    /**
+     * Specifies the modifier to be hold while clicking
+     * @default "shift"
+     */
+    modifier?: "ctrl" | "alt" | "meta" | "shift";
+  };
 };
 
 type CustomShadow = {

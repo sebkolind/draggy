@@ -21,6 +21,9 @@ function draggy({ target, ...options }: Options) {
       direction: "vertical",
       placement: "any",
       loose: true,
+      selection: {
+        enabled: false,
+      },
       ...options,
     },
   };
@@ -121,19 +124,27 @@ function draggy({ target, ...options }: Options) {
 }
 
 const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
-  if (ev.shiftKey) {
-    context.multiple.push({
-      origin: el,
-      style: {
-        display: el.style.display,
-      },
-      originZone: el.parentElement,
-      nextSibling: el.nextElementSibling as HTMLElement | null,
-    });
+  if (context.options.selection?.enabled) {
+    const mod = context.options.selection.modifier ?? "shift";
+    const shift = mod === "shift" && ev.shiftKey;
+    const meta = mod === "meta" && ev.metaKey;
+    const alt = mod === "alt" && ev.altKey;
+    const ctrl = mod === "ctrl" && ev.ctrlKey;
 
-    el.classList.add(CLASSNAMES.selection);
+    if (shift || meta || alt || ctrl) {
+      context.multiple.push({
+        origin: el,
+        style: {
+          display: el.style.display,
+        },
+        originZone: el.parentElement,
+        nextSibling: el.nextElementSibling as HTMLElement | null,
+      });
 
-    return;
+      el.classList.add(CLASSNAMES.selection);
+
+      return;
+    }
   }
 
   context.shadow = createShadow(context, ev, el);
