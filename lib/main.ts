@@ -69,6 +69,8 @@ function draggy({ target, ...options }: Options) {
       const bool = context.options.onBeforeDrop(ev, {
         origin: context.origin,
         zone: context.zone,
+        shadow: context.shadow,
+        multiple: context.multiple,
       });
 
       if (!bool) {
@@ -83,6 +85,8 @@ function draggy({ target, ...options }: Options) {
     context.options.onDrop?.(ev, {
       origin: context.origin,
       zone: context.zone,
+      shadow: context.shadow,
+      multiple: context.multiple,
     });
 
     context.shadow.remove();
@@ -227,6 +231,8 @@ const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
       context.options.onLeave?.(ev, {
         origin: context.origin,
         zone: context.zone,
+        shadow: context.shadow,
+        multiple: context.multiple,
       });
       context.zone = null;
     }
@@ -246,11 +252,15 @@ const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
           context.options.onEnter?.(ev, {
             origin: context.origin,
             zone: context.zone,
+            shadow: context.shadow,
+            multiple: context.multiple,
           });
         }
         context.options.onOver?.(ev, {
           origin: context.origin,
           zone: context.zone,
+          shadow: context.shadow,
+          multiple: context.multiple,
         });
         handlePushing(context, x, y);
         break;
