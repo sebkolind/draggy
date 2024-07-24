@@ -1,4 +1,4 @@
-import { fireEvent, screen } from "@testing-library/dom";
+import { fireEvent, screen, waitFor } from "@testing-library/dom";
 import { draggy } from "../main";
 
 const html = `
@@ -12,11 +12,12 @@ const html = `
       <div class="card">Card 2</div>
       <div class="card">Card 3</div>
     </div>
-    <div class="column">
+    <div class="column" data-testid="column">
       <div class="card">Card 1</div>
       <div class="card">Card 2</div>
       <div class="card">Card 3</div>
       <div class="card">Card 4</div>
+      <div class="card">Card 5</div>
     </div>
   </div>
 `;
@@ -83,6 +84,50 @@ describe("draggy", () => {
     fireEvent.mouseUp(draggable);
 
     expect(onDrop).toHaveBeenCalledTimes(1);
+  });
+
+  test("that multi-selection starts", async () => {
+    const onStart = jest.fn();
+
+    draggy({
+      target: ".column",
+      onStart,
+    });
+
+    const column = await screen.findByTestId("column");
+    const draggable1 = await screen.findByText("Card 4");
+    const draggable2 = await screen.findByText("Card 5");
+
+    fireEvent.mouseDown(draggable1, { shiftKey: true });
+    fireEvent.mouseDown(draggable2, { shiftKey: true });
+    fireEvent.mouseDown(draggable2);
+
+    const shadow = document.querySelector(".draggy-dragging");
+
+    expect(onStart).toHaveBeenCalledTimes(1);
+    expect(onStart).toHaveBeenCalledWith(new MouseEvent("mousedown"), {
+      multiple: [
+        {
+          origin: draggable1,
+          nextSibling: draggable2,
+          originZone: column,
+          style: {
+            display: "",
+          },
+        },
+        {
+          origin: draggable2,
+          nextSibling: null,
+          originZone: column,
+          style: {
+            display: "",
+          },
+        },
+      ],
+      origin: draggable2,
+      shadow,
+      zone: null,
+    });
   });
 
   // @TODO: This is a bit weak.
