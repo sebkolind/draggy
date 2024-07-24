@@ -20,6 +20,7 @@ function draggy({ target, ...options }: Options) {
       optimistic: true,
       direction: "vertical",
       placement: "any",
+      loose: true,
       ...options,
     },
   };
@@ -57,7 +58,11 @@ function draggy({ target, ...options }: Options) {
   const onMouseUp = (ev: MouseEvent) => {
     ev.preventDefault();
 
-    if (context.options.onBeforeDrop && context.originZone && context.origin) {
+    if (!context.origin || !context.originZone || !context.shadow) {
+      return;
+    }
+
+    if (context.options.onBeforeDrop) {
       const bool = context.options.onBeforeDrop(ev, {
         origin: context.origin,
         zone: context.zone,
@@ -68,19 +73,23 @@ function draggy({ target, ...options }: Options) {
       }
     }
 
+    if (!context.zone && !context.options.loose) {
+      context.originZone.insertBefore(context.origin, context.nextSibling);
+    }
+
     context.options.onDrop?.(ev, {
       origin: context.origin,
       zone: context.zone,
     });
 
-    context.shadow?.remove();
+    context.shadow.remove();
     context.shadow = null;
 
-    if (context.multiple && context.zone && context.origin) {
+    if (context.multiple.length) {
       for (let i = 0; i < context.multiple.length; i++) {
         const m = context.multiple[i];
         if (!m || !m.origin) return;
-        context.zone.insertBefore(m.origin, context.origin.nextElementSibling);
+        context.zone?.insertBefore(m.origin, context.origin.nextElementSibling);
         m.origin.style.display = m.style.display;
         m.origin.classList.remove(CLASSNAMES.selection);
       }
@@ -88,7 +97,7 @@ function draggy({ target, ...options }: Options) {
       context.multiple = [];
     }
 
-    context.origin?.classList.remove(CLASSNAMES.origin);
+    context.origin.classList.remove(CLASSNAMES.origin);
     context.origin = null;
 
     context.removeMouseMove?.();
