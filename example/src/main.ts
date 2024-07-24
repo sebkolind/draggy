@@ -3,7 +3,7 @@ import { draggy } from "@sebkolind/draggy";
 draggy({
   target: ".column",
   placement: "any",
-  onShadow(_, { shadow, multiple }) {
+  onStart(_, { shadow, multiple }) {
     if (!multiple?.length) return;
 
     const label = document.createElement("div");
