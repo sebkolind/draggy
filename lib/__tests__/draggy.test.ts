@@ -76,6 +76,9 @@ describe("draggy", () => {
     draggy({
       target: ".column",
       onStart,
+      selection: {
+        enabled: true,
+      },
     });
 
     const column = await screen.findByTestId("column");
