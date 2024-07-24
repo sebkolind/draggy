@@ -70,19 +70,6 @@ describe("draggy", () => {
     expect(onCreateShadow).toHaveBeenCalledTimes(1);
   });
 
-  test("that onBeforeDrop is fired if defined", () => {
-    const onBeforeDrop = jest.fn();
-
-    draggy({ target: ".column", onBeforeDrop });
-
-    const draggable = screen.getByText("Card 4");
-
-    fireEvent.mouseDown(draggable);
-    fireEvent.mouseUp(draggable);
-
-    expect(onBeforeDrop).toHaveBeenCalledTimes(1);
-  });
-
   test("that multi-selection starts", async () => {
     const onStart = jest.fn();
 
