@@ -45,19 +45,29 @@ describe("draggy", () => {
     expect(screen.getByText("Card 4")).toBeTruthy();
   });
 
-  test("that onStart is fired if defined", () => {
+  test("that events are fired if defined", () => {
     const onStart = jest.fn();
+    const onBeforeDrop = jest.fn();
+    const onDrop = jest.fn();
+    const onCreateShadow = jest.fn();
 
     draggy({
       target: document.querySelectorAll(".column"),
       onStart,
+      onBeforeDrop,
+      onDrop,
+      onCreateShadow,
     });
 
     const draggable = screen.getByText("Card 4");
 
     fireEvent.mouseDown(draggable);
+    fireEvent.mouseUp(draggable);
 
     expect(onStart).toHaveBeenCalledTimes(1);
+    expect(onBeforeDrop).toHaveBeenCalledTimes(1);
+    expect(onDrop).toHaveBeenCalledTimes(1);
+    expect(onCreateShadow).toHaveBeenCalledTimes(1);
   });
 
   test("that onBeforeDrop is fired if defined", () => {
