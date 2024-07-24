@@ -22,13 +22,36 @@ type Draggable = Pick<Context, "origin" | "originZone" | "nextSibling"> & {
 
 type Options = {
   target: string | Element | Element[] | NodeListOf<Element> | null;
+  /**
+   * Event handler triggered when dragging starts.
+   */
   onStart?: EventHandler;
+  /**
+   * Event handler triggered when the draggable leaves a zone.
+   */
   onLeave?: EventHandler;
+  /**
+   * Event handler triggered when the draggable enters a zone.
+   */
   onEnter?: EventHandler;
+  /**
+   * Event handler triggered when the draggable is over a zone.
+   */
   onOver?: EventHandler;
+  /**
+   * Event handler triggered before the draggable is dropped.
+   * Returns `true` to allow the drop, or `false` to disallow it.
+   */
   onBeforeDrop?: EventHandler<boolean>;
+  /**
+   * Event handler triggered when the draggable is dropped.
+   */
   onDrop?: EventHandler;
-  onShadow?: EventHandler;
+  /**
+   * Event handler to create a custom shadow element.
+   * Will override the default shadow behavior.
+   */
+  onCreateShadow?: EventHandler<CustomShadow>;
   /**
    * Specifies where a draggable can be dropped.
    * - "start": Only allow dropping at the start. With direction=vertical this is the top, and direction=horizontal is to the right.
@@ -55,6 +78,15 @@ type Options = {
    * @default true
    */
   optimistic?: boolean;
+};
+
+type CustomShadow = {
+  el: HTMLElement;
+  /**
+   * The drag offset from the top left corner of the element.
+   * @default { x: 0, y: 0 }
+   */
+  offset?: { x: number; y: number };
 };
 
 type EventHandler<T = void> = (

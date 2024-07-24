@@ -48,10 +48,6 @@ function draggy({ target, ...options }: Options) {
       const onMouseDown = (ev: MouseEvent) => {
         ev.preventDefault();
         handleMouseDown(context, ev, c);
-        context.options.onStart?.(ev, {
-          origin: context.origin,
-          zone: context.zone,
-        });
       };
       c.addEventListener("mousedown", onMouseDown);
       context.events.set(c, onMouseDown);
@@ -149,44 +145,57 @@ const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   context.originZone = el.parentElement;
   context.nextSibling = el.nextElementSibling as HTMLElement | null;
 
+  context.options.onStart?.(ev, {
+    origin: context.origin,
+    zone: context.zone,
+    shadow: context.shadow,
+    multiple: context.multiple,
+  });
+
   handleChildren(context);
 };
 
 const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
-  const shadow = el.cloneNode(true) as HTMLElement;
+  const customShadow = context.options.onCreateShadow?.(ev, context);
+  const shadow = customShadow?.el ?? (el.cloneNode(true) as HTMLElement);
 
   shadow.classList.add(CLASSNAMES.dragging);
+
+  if (customShadow?.el && !(customShadow.el instanceof HTMLElement)) {
+    throw new Error(
+      "Error: The custom shadow provided is not a valid HTMLElement.",
+    );
+  }
+
+  if (!customShadow) {
+    shadow.style.width = `${el.offsetWidth}px`;
+    shadow.style.height = `${el.offsetHeight}px`;
+  }
+
+  shadow.style.zIndex = "9999";
   shadow.style.position = "absolute";
   shadow.style.pointerEvents = "none";
-  shadow.style.width = `${el.offsetWidth}px`;
-  shadow.style.height = `${el.offsetHeight}px`;
-  shadow.style.zIndex = "9999";
 
   const rect = el.getBoundingClientRect();
-  const offsets = { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
+  const offset = customShadow
+    ? { x: customShadow.offset?.x ?? 0, y: customShadow.offset?.y ?? 0 }
+    : { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
 
-  shadow.style.left = `${ev.clientX - offsets.x + scrollX}px`;
-  shadow.style.top = `${ev.clientY - offsets.y + scrollY}px`;
+  shadow.style.left = `${ev.clientX - offset.x + scrollX}px`;
+  shadow.style.top = `${ev.clientY - offset.y + scrollY}px`;
 
-  context.options.onShadow?.(ev, {
-    shadow,
-    origin: el,
-    zone: context.zone,
-    multiple: context.multiple,
-  });
-
-  const onMouseMove = (ev: Event) => handleMouseMove(ev, offsets);
+  const onMouseMove = (ev: Event) => handleMouseMove(ev, offset);
   document.addEventListener("mousemove", onMouseMove);
 
-  const handleMouseMove = (ev: Event, offsets: { x: number; y: number }) => {
+  const handleMouseMove = (ev: Event, offset: { x: number; y: number }) => {
     const e = ev as MouseEvent;
     e.preventDefault();
 
     const x = e.clientX;
     const y = e.clientY;
 
-    shadow.style.left = `${x - offsets.x + scrollX}px`;
-    shadow.style.top = `${y - offsets.y + scrollY}px`;
+    shadow.style.left = `${x - offset.x + scrollX}px`;
+    shadow.style.top = `${y - offset.y + scrollY}px`;
 
     const point = document.elementFromPoint(x, y);
     if (!point) {
