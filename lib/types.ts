@@ -78,6 +78,9 @@ type Options = {
    * @default true
    */
   optimistic?: boolean;
+  /**
+   * Configure selecting multiple items
+   */
   selection?: {
     /**
      * Enable selection
