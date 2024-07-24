@@ -1,4 +1,4 @@
-import { fireEvent, screen, waitFor } from "@testing-library/dom";
+import { fireEvent, screen } from "@testing-library/dom";
 import { draggy } from "../main";
 
 const html = `
