@@ -61,6 +61,8 @@ function draggy({ target, ...options }: Options) {
   const onMouseUp = (ev: MouseEvent) => {
     ev.preventDefault();
 
+    context.options.onEnd?.(ev, getContext(context));
+
     if (!context.origin || !context.originZone || !context.shadow) {
       return;
     }
@@ -347,6 +349,13 @@ const handlePushing = (context: Context, x: number, y: number) => {
   }
 };
 
+/**
+ * Handles the pointer events for the child elements of the zones.
+ * If a drag is ongoing, it disables pointer events.
+ * If not, it reverts the pointer events.
+ *
+ * @param {Context} context - The drag and drop context containing the state and options.
+ */
 const handleChildren = (context: Context) => {
   const revert = context.shadow == null;
   for (let i = 0; i < context.children.length; i++) {

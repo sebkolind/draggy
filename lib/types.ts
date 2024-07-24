@@ -48,6 +48,11 @@ type Options = {
    */
   onDrop?: EventHandler;
   /**
+   * Event handler triggered when the drag ends.
+   * Will always fire.
+   */
+  onEnd?: EventHandler;
+  /**
    * Event handler to create a custom shadow element.
    * Will override the default shadow behavior.
    */
@@ -107,7 +112,7 @@ type CustomShadow = {
 type EventHandler<T = void> = (
   event: Event,
   context: Pick<Context, "origin" | "zone"> &
-    Partial<Pick<Context, "shadow" | "multiple">>,
+    Partial<Pick<Context, "shadow" | "multiple" | "zones">>,
 ) => T;
 
 export { Context, Options };
