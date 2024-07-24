@@ -90,6 +90,7 @@ describe("draggy", () => {
     fireEvent.mouseDown(draggable2);
 
     const shadow = document.querySelector(".draggy-dragging");
+    const zones = document.querySelectorAll(".column");
 
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(onStart).toHaveBeenCalledWith(new MouseEvent("mousedown"), {
@@ -114,6 +115,7 @@ describe("draggy", () => {
       origin: draggable2,
       shadow,
       zone: null,
+      zones: Array.from(zones),
     });
   });
 

@@ -1,6 +1,6 @@
 import { CLASSNAMES } from "./constants";
 import { Options, Context } from "./types";
-import { isElement } from "./utils";
+import { getContext, isElement } from "./utils";
 
 function draggy({ target, ...options }: Options) {
   const context: Context = {
@@ -66,12 +66,7 @@ function draggy({ target, ...options }: Options) {
     }
 
     if (context.options.onBeforeDrop) {
-      const bool = context.options.onBeforeDrop(ev, {
-        origin: context.origin,
-        zone: context.zone,
-        shadow: context.shadow,
-        multiple: context.multiple,
-      });
+      const bool = context.options.onBeforeDrop(ev, getContext(context));
 
       if (!bool) {
         context.originZone.insertBefore(context.origin, context.nextSibling);
@@ -82,12 +77,7 @@ function draggy({ target, ...options }: Options) {
       context.originZone.insertBefore(context.origin, context.nextSibling);
     }
 
-    context.options.onDrop?.(ev, {
-      origin: context.origin,
-      zone: context.zone,
-      shadow: context.shadow,
-      multiple: context.multiple,
-    });
+    context.options.onDrop?.(ev, getContext(context));
 
     context.shadow.remove();
     context.shadow = null;
@@ -169,18 +159,16 @@ const handleMouseDown = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   context.originZone = el.parentElement;
   context.nextSibling = el.nextElementSibling as HTMLElement | null;
 
-  context.options.onStart?.(ev, {
-    origin: context.origin,
-    zone: context.zone,
-    shadow: context.shadow,
-    multiple: context.multiple,
-  });
+  context.options.onStart?.(ev, getContext(context));
 
   handleChildren(context);
 };
 
 const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
-  const customShadow = context.options.onCreateShadow?.(ev, context);
+  const customShadow = context.options.onCreateShadow?.(
+    ev,
+    getContext(context),
+  );
   const shadow = customShadow?.el ?? (el.cloneNode(true) as HTMLElement);
 
   shadow.classList.add(CLASSNAMES.dragging);
@@ -228,12 +216,7 @@ const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
     }
 
     if (context.zone && !context.zone.contains(point)) {
-      context.options.onLeave?.(ev, {
-        origin: context.origin,
-        zone: context.zone,
-        shadow: context.shadow,
-        multiple: context.multiple,
-      });
+      context.options.onLeave?.(ev, getContext(context));
       context.zone = null;
     }
 
@@ -249,19 +232,9 @@ const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
       if (z.contains(point)) {
         if (context.zone !== z) {
           context.zone = z;
-          context.options.onEnter?.(ev, {
-            origin: context.origin,
-            zone: context.zone,
-            shadow: context.shadow,
-            multiple: context.multiple,
-          });
+          context.options.onEnter?.(ev, getContext(context));
         }
-        context.options.onOver?.(ev, {
-          origin: context.origin,
-          zone: context.zone,
-          shadow: context.shadow,
-          multiple: context.multiple,
-        });
+        context.options.onOver?.(ev, getContext(context));
         handlePushing(context, x, y);
         break;
       }
