@@ -113,6 +113,7 @@ describe("draggy", () => {
         },
       ],
       origin: draggable2,
+      originZone: column,
       shadow,
       zone: null,
       zones: Array.from(zones),
