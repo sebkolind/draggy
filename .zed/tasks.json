@@ -1,0 +1,10 @@
+[
+  {
+    "label": "npm: dev",
+    "command": "npm run dev"
+  },
+  {
+    "label": "example -> npm: dev",
+    "command": "cd example; npm run dev"
+  }
+]
