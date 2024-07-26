@@ -6,3 +6,5 @@ coverage/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+docs/.vitepress/dist
+docs/.vitepress/cache
