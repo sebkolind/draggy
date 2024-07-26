@@ -5,10 +5,11 @@ const isElement = (target: EventTarget | null): target is HTMLElement => {
 };
 
 const getContext = (context: Context) => {
-  const { origin, zone, shadow, multiple, zones } = context;
+  const { origin, zone, originZone, shadow, multiple, zones } = context;
 
   return {
     origin,
+    originZone,
     zone,
     shadow,
     multiple,

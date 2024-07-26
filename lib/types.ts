@@ -101,7 +101,7 @@ type Options = {
 };
 
 type CustomShadow = {
-  el: HTMLElement;
+  el: HTMLElement | null;
   /**
    * The drag offset from the top left corner of the element.
    * @default { x: 0, y: 0 }
@@ -111,8 +111,10 @@ type CustomShadow = {
 
 type EventHandler<T = void> = (
   event: Event,
-  context: Pick<Context, "origin" | "zone"> &
-    Partial<Pick<Context, "shadow" | "multiple" | "zones">>,
+  context: Pick<
+    Context,
+    "origin" | "zone" | "zones" | "originZone" | "shadow" | "multiple"
+  >,
 ) => T;
 
 export { Context, Options };
