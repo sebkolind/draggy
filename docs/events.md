@@ -49,6 +49,10 @@ Triggered when the draggable is dropped. If `onbeforeDrop` returns `false` this 
 
 Triggered to create a custom shadow element. Will override the default shadow behavior.
 
+:::tip NOTE
+This won't work if [`enableShadow`](./options#enableshadow) is set to `false`.
+:::
+
 ## `onEnd` <Badge type="info" text="optional" />
 
 - Type: `EventHandler`

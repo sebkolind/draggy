@@ -55,3 +55,10 @@ Configuration for selecting multiple items.
 - `modifier`: Specifies the key modifier to hold while clicking when selection is enabled.
   - Type: `"ctrl" | "alt" | "meta" | "shift"`
   - Default: `"shift"`
+
+## `enableShadow` <Badge type="info" text="optional" />
+
+Enable or disable shadow element creation during dragging.
+
+- Type: `boolean`
+- Default: `true`
