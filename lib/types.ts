@@ -98,6 +98,12 @@ type Options = {
      */
     modifier?: "ctrl" | "alt" | "meta" | "shift";
   };
+  /**
+   * Enable or disable shadow element creation during dragging.
+   * When enabled, a shadow element will be created and follow the cursor during the drag operation.
+   * @default true
+   */
+  enableShadow?: boolean;
 };
 
 type CustomShadow = {
@@ -117,4 +123,4 @@ type EventHandler<T = void> = (
   >,
 ) => T;
 
-export { Context, Options };
+export { Context, Options, CustomShadow };
