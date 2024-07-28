@@ -1,7 +1,7 @@
 import { CLASSNAMES } from "./constants";
 import { setupShadow } from "./shadow";
-import { Options, Context } from "./types";
-import { getContext, isElement } from "./utils";
+import { Context, Options } from "./types";
+import { clone, getContext, isElement } from "./utils";
 
 function draggy({ target, ...options }: Options) {
   const context: Context = {
@@ -189,4 +189,4 @@ const handleChildren = (context: Context) => {
   }
 };
 
-export { draggy };
+export { clone, draggy };

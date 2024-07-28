@@ -1,6 +1,6 @@
 import { CLASSNAMES } from "./constants";
 import { Context } from "./types";
-import { getContext } from "./utils";
+import { clone, getContext } from "./utils";
 
 const setupShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   const { shadow, offset: customOffset } = createShadow(ev, context, el);
@@ -79,7 +79,7 @@ const createShadow = (ev: MouseEvent, context: Context, el: HTMLElement) => {
     ev,
     getContext(context),
   );
-  const shadow = customShadow?.el ?? (el.cloneNode(true) as HTMLElement);
+  const shadow = customShadow?.el ?? clone(el);
 
   shadow.classList.add(CLASSNAMES.dragging);
 

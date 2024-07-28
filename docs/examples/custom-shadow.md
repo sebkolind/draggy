@@ -31,7 +31,7 @@ In the `context` we can find the `origin` which is the element being dragged.
 We can use this to make a copy and alter the look.
 
 ::: danger NOTE
-It is important that you use `.cloneNode(deep?: boolean)` to avoid making changes to the original element.
+It is important that you use `clone()` to avoid making changes to the original element.
 If you don't, you would have to manually handle the mutations
 that Draggy makes during a drag. If you _do_ want to handle this manually you can do so
 by utilizing the <a href="/events">Events</a>.
@@ -42,9 +42,7 @@ draggy({
   target: ".container",
   onCreateShadow(_, { origin }) {
     // Either clone the `origin`, or create a new element.
-    const shadow = origin
-      ? (origin.cloneNode(true) as HTMLElement)
-      : document.createElement("div");
+    const shadow = origin ? clone(origin) : document.createElement("div");
 
     // Define how the shadow should look
     shadow.style.width = "200px";
