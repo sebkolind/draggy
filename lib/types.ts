@@ -112,7 +112,12 @@ type CustomShadow = {
    * The drag offset from the top left corner of the element.
    * @default { x: 0, y: 0 }
    */
-  offset?: { x: number; y: number };
+  offset?: Offset;
+};
+
+type Offset = {
+  x: number;
+  y: number;
 };
 
 type EventHandler<T = void> = (
@@ -123,4 +128,4 @@ type EventHandler<T = void> = (
   >,
 ) => T;
 
-export { Context, Options, CustomShadow };
+export { Context, Options, CustomShadow, Offset };

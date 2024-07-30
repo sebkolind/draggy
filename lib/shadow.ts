@@ -1,9 +1,9 @@
 import { CLASSNAMES } from "./constants";
-import { Context } from "./types";
+import { Context, Offset } from "./types";
 import { clone, getContext } from "./utils";
 
 const setupShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
-  const { shadow, offset: customOffset } = createShadow(ev, context, el);
+  const { shadow, offset: customOffset } = createShadow(context, ev, el);
 
   const rect = el.getBoundingClientRect();
   const offset = getOffset(ev, rect, customOffset);
@@ -13,15 +13,14 @@ const setupShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
     shadow.style.top = `${ev.clientY - offset.y + scrollY}px`;
   }
 
-  const onMouseMove = (ev: Event) => handleMouseMove(ev, offset);
+  const onMouseMove = (ev: MouseEvent) => handleMouseMove(ev, offset);
   document.addEventListener("mousemove", onMouseMove);
 
-  const handleMouseMove = (ev: Event, offset: { x: number; y: number }) => {
-    const e = ev as MouseEvent;
-    e.preventDefault();
+  const handleMouseMove = (ev: MouseEvent, offset: Offset) => {
+    ev.preventDefault();
 
-    const x = e.clientX;
-    const y = e.clientY;
+    const x = ev.clientX;
+    const y = ev.clientY;
 
     if (shadow) {
       shadow.style.left = `${x - offset.x + scrollX}px`;
@@ -54,7 +53,7 @@ const setupShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
           context.options.onEnter?.(ev, getContext(context));
         }
         context.options.onOver?.(ev, getContext(context));
-        handlePushing(context, x, y);
+        handlePlacement(context, { x, y });
         break;
       }
     }
@@ -70,26 +69,23 @@ const setupShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   return shadow;
 };
 
-const createShadow = (ev: MouseEvent, context: Context, el: HTMLElement) => {
+const createShadow = (context: Context, ev: MouseEvent, el: HTMLElement) => {
   if (!context.options.enableShadow) {
     return { shadow: null, offset: { x: 0, y: 0 } };
   }
 
-  const customShadow = context.options.onCreateShadow?.(
-    ev,
-    getContext(context),
-  );
-  const shadow = customShadow?.el ?? clone(el);
+  const custom = context.options.onCreateShadow?.(ev, getContext(context));
+  const shadow = custom?.el ?? clone(el);
 
   shadow.classList.add(CLASSNAMES.dragging);
 
-  if (customShadow?.el && !(customShadow.el instanceof HTMLElement)) {
+  if (custom?.el && !(custom.el instanceof HTMLElement)) {
     throw new Error(
       "Error: The custom shadow provided is not a valid HTMLElement.",
     );
   }
 
-  if (!customShadow) {
+  if (!custom) {
     shadow.style.width = `${el.offsetWidth}px`;
     shadow.style.height = `${el.offsetHeight}px`;
   }
@@ -98,20 +94,16 @@ const createShadow = (ev: MouseEvent, context: Context, el: HTMLElement) => {
   shadow.style.position = "absolute";
   shadow.style.pointerEvents = "none";
 
-  return { shadow, offset: customShadow?.offset };
+  return { shadow, offset: custom?.offset };
 };
 
-const getOffset = (
-  ev: MouseEvent,
-  rect: DOMRect,
-  customOffset?: { x: number; y: number },
-) => {
+const getOffset = (ev: MouseEvent, rect: DOMRect, customOffset?: Offset) => {
   return customOffset
     ? customOffset
     : { x: ev.clientX - rect.left, y: ev.clientY - rect.top };
 };
 
-const handlePushing = (context: Context, x: number, y: number) => {
+const handlePlacement = (context: Context, { x, y }: Offset) => {
   if (!context.zone || !context.origin) {
     console.error("Error: Zone or origin is null. Cannot handle pushing.");
     return;
