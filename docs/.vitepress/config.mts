@@ -27,11 +27,12 @@ export default defineConfig({
         items: [
           { text: "Custom Shadow", link: "/examples/custom-shadow" },
           { text: "Restrict a Drop", link: "/examples/restrict-a-drop" },
+          { text: "Clean-up (destroy)", link: "/examples/clean-up" },
           {
             text: "Frameworks",
             items: [
-              { text: "React", link: "/examples/react" },
               { text: "Vue", link: "/examples/vue" },
+              { text: "React", link: "/examples/react" },
             ],
           },
         ],
