@@ -15,7 +15,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com:sebkolind/draggy.git"
+    "url": "git+ssh://git@github.com/sebkolind/draggy.git"
   },
   "scripts": {
     "build": "rm -rf .parcel-cache dist && parcel build",
