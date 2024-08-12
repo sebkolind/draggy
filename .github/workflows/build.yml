@@ -24,18 +24,3 @@ jobs:
         run: npm run build
       - name: Run tests
         run: npm run test
-  example:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-      - name: cd example
-        run: cd example
-      - name: Install dependencies
-        run: npm install
-      - name: Run build
-        run: npm run build
