@@ -16,10 +16,10 @@ import { draggy } from "@sebkolind/draggy";
 draggy({ target: ".column" });
 ```
 
-## Demo
-
-https://github.com/user-attachments/assets/8ebc8acf-4c08-414c-a48f-a5ee130a8ebe
-
 ## Documentation
 
 Find the full documentation [here](https://sebkolind.github.io/draggy/).
+
+## Demo
+
+https://github.com/user-attachments/assets/8ebc8acf-4c08-414c-a48f-a5ee130a8ebe
