@@ -1,4 +1,4 @@
-import { draggy } from "@sebkolind/draggy";
+import {draggy} from "@sebkolind/draggy";
 
 draggy({
   target: ".column",
@@ -6,7 +6,7 @@ draggy({
   selection: {
     enabled: true,
   },
-  onStart(_, { shadow, multiple }) {
+  onStart(_, {shadow, multiple}) {
     if (!multiple?.length) return;
 
     const label = document.createElement("div");
@@ -24,4 +24,29 @@ draggy({
 
     shadow?.append(label);
   },
+  onDrop(_, {origin, zone}) {
+    const el = origin?.querySelector(".status")
+    if (!el) return;
+    const status = el.textContent?.toLowerCase().replace(" ", "-");
+    const newStatus = zone?.dataset.status;
+    if (!newStatus || !status) return;
+    if (status === newStatus) return;
+
+    el.textContent = formatStatus(newStatus);
+    el.classList.remove(status);
+    el.classList.add(newStatus);
+  }
 });
+
+function formatStatus(status: string) {
+  switch (status) {
+    case "to-do":
+      return "To-do";
+    case "in-progress":
+      return "In Progress";
+    case "done":
+      return "Done";
+    default:
+      return status;
+  }
+}
