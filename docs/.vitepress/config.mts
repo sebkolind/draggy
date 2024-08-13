@@ -34,6 +34,7 @@ export default defineConfig({
             items: [
               {text: "Vue", link: "/examples/vue"},
               {text: "React", link: "/examples/react"},
+              {text: "Svelte", link: "/examples/svelte"},
             ],
           },
         ],
