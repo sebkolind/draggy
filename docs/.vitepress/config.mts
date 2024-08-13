@@ -42,6 +42,14 @@ export default defineConfig({
         text: "API",
         items: [{text: "Reference", link: "/reference"}],
       },
+      {
+        text: "Report an Issue",
+        link: "https://github.com/sebkolind/draggy/issues",
+      },
+      {
+        text: "Join the Community",
+        link: "https://github.com/sebkolind/draggy/discussions",
+      }
     ],
 
     socialLinks: [
