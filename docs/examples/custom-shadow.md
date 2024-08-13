@@ -34,7 +34,7 @@ We can use this to make a copy and alter the look.
 It is important that you use `clone()` to avoid making changes to the original element.
 If you don't, you would have to manually handle the mutations
 that Draggy makes during a drag. If you _do_ want to handle this manually you can do so
-by utilizing the <a href="/events">Events</a>.
+by utilizing the <a href="../events">Events</a>.
 :::
 
 ```ts
