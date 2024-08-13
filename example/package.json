@@ -13,6 +13,6 @@
     "parcel": "^2.12.0"
   },
   "dependencies": {
-    "@sebkolind/draggy": "file:.."
+    "@sebkolind/draggy": "^0.0.1"
   }
 }
