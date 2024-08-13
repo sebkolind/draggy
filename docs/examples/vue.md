@@ -12,6 +12,8 @@ You can read more about how to use the Options API in [Vue's documentation here]
 import { onMounted, ref } from "vue";
 import { draggy } from "@sebkolind/draggy";
 
+let drag = null;
+
 const target = ref(null);
 const items = ref([
   { id: 1, title: "Draggable #1" },
@@ -20,7 +22,11 @@ const items = ref([
 ]);
 
 onMounted(() => {
-  draggy({ target: target.value });
+  drag = draggy({ target: target.value });
+});
+
+onUnmounted(() => {
+  drag.destroy();
 });
 </script>
 
