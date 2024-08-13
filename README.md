@@ -18,10 +18,7 @@ draggy({ target: ".column" });
 
 ## Demo
 
-<video width="640" height="480">
-  <source src="demo.mov" type="video/quicktime">
-  Your browser does not support the video tag.
-</video>
+https://github.com/user-attachments/assets/8ebc8acf-4c08-414c-a48f-a5ee130a8ebe
 
 ## Documentation
 
