@@ -38,6 +38,8 @@ by utilizing the <a href="/events">Events</a>.
 :::
 
 ```ts
+import { draggy, clone } from "@sebkolind/draggy";
+
 draggy({
   target: ".container",
   onCreateShadow(_, { origin }) {
