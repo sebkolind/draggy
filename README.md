@@ -16,9 +16,9 @@ import { draggy } from "@sebkolind/draggy";
 draggy({ target: ".column" });
 ```
 
-## Documentation
+## Learn more
 
-For documentation, examples, and more visit the [documentation](https://sebkolind.github.io/draggy/).
+For docs, examples, and more visit the [documentation site](https://sebkolind.github.io/draggy/).
 
 ## Demo
 
