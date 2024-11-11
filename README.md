@@ -18,7 +18,7 @@ draggy({ target: ".column" });
 
 ## Learn more
 
-For docs, examples, and more visit the [documentation site](https://sebkolind.github.io/draggy/).
+For docs, examples, and more visit the [documentation site](https://sebkolind.github.io/draggy/getting-started.html).
 
 ## Demo
 
