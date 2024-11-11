@@ -7,7 +7,7 @@ export default defineConfig({
   base: "/draggy/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
-    nav: [{text: "Home", link: "/"}],
+    nav: [{text: "Guide", link: "/getting-started"}],
 
     sidebar: [
       {
