@@ -1,4 +1,4 @@
-# Draggy
+# 🐲 Draggy
 
 A headless, framework agnostic and lightweight drag&drop library.
 
