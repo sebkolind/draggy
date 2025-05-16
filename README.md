@@ -1,6 +1,6 @@
 # Draggy
 
-A framework agnostic and lightweight drag&drop library built with TypeScript.
+A headless, framework agnostic and lightweight drag&drop library.
 
 ## Install
 
