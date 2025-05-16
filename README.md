@@ -8,6 +8,13 @@ A framework agnostic and lightweight drag&drop library built with TypeScript.
 npm i @sebkolind/draggy
 ```
 
+## Features
+
+- **Selection**: Select [multiple](https://sebkolind.github.io/draggy/options.html#selection) elements.
+- **Direction**: Supports [horizontal and vertical](https://sebkolind.github.io/draggy/options.html#direction) dragging.
+- **Headless**: Bring your own UI.
+- **Events**: Listen to [various events](https://sebkolind.github.io/draggy/events.html) and make it fit your needs.
+
 ## Usage
 
 ```js
