@@ -30,9 +30,33 @@ This will use the default configuration. You can read more about the options ava
 ```ts
 import { draggy } from "@sebkolind/draggy";
 
-draggy({
-  target: ".container",
-});
+draggy({ target: ".container" });
+```
+
+```html
+<!-- Drag items within a container -->
+<div class="container">
+  <div class="item">Item 1</div>
+  <div class="item">Item 2</div>
+  <div class="item">Item 3</div>
+</div>
+
+<!-- Drag items within a container, and to other .container's -->
+<div class="container">
+  <div class="item">Item 1</div>
+  <div class="item">Item 2</div>
+  <div class="item">Item 3</div>
+</div>
+<div class="container">
+  <div class="item">Item 4</div>
+  <div class="item">Item 5</div>
+  <div class="item">Item 6</div>
+</div>
+<div class="container">
+  <div class="item">Item 7</div>
+  <div class="item">Item 8</div>
+  <div class="item">Item 9</div>
+</div>
 ```
 
 ### What does this do?
